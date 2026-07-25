@@ -45,6 +45,13 @@ theme_override_font_sizes/font_size = 75
 text = "OPTION"
 alignment = 2
 
+[node name="debug" type="Button" parent="CanvasLayer/VBoxContainer" unique_id=123456789]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "DEBUG: 鍋UI"
+flat = true
+alignment = 2
+
 [node name="exit" type="Button" parent="CanvasLayer/VBoxContainer" unique_id=979953836]
 layout_mode = 2
 theme_override_font_sizes/font_size = 75

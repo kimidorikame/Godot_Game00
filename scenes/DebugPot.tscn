@@ -1,0 +1,65 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/debug_pot.gd" id="1_dp"]
+
+[node name="DebugPot" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_dp")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_left = 80.0
+offset_top = 80.0
+offset_right = 800.0
+offset_bottom = 900.0
+theme_override_constants/separation = 20
+
+[node name="LabelTitle" type="Label" parent="VBoxContainer"]
+theme_override_font_sizes/font_size = 42
+text = "=== 鍋 デバッグ UI ==="
+
+[node name="LabelVolume" type="Label" parent="VBoxContainer"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 36
+text = "volume : --"
+
+[node name="LabelRich" type="Label" parent="VBoxContainer"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 36
+text = "rich   : --"
+
+[node name="LabelLight" type="Label" parent="VBoxContainer"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 36
+text = "light  : --"
+
+[node name="LabelUmami" type="Label" parent="VBoxContainer"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 36
+text = "umami  : --"
+
+[node name="LabelStatus" type="Label" parent="VBoxContainer"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 40
+text = ""
+
+[node name="BtnSetup" type="Button" parent="VBoxContainer"]
+theme_override_font_sizes/font_size = 30
+text = "[仕込み direct]"
+
+[node name="BtnServe" type="Button" parent="VBoxContainer"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 30
+text = "[提供 serve]"
+
+[node name="BtnTurnEnd" type="Button" parent="VBoxContainer"]
+theme_override_font_sizes/font_size = 30
+text = "[ターン経過 on_turn_end]"
+
+[node name="BtnAddWater" type="Button" parent="VBoxContainer"]
+theme_override_font_sizes/font_size = 30
+text = "[水を差す add_water]"
+
+[node name="BtnReset" type="Button" parent="VBoxContainer"]
+theme_override_font_sizes/font_size = 30
+text = "[リセット]  ← 空鍋（売り切れテスト）"
