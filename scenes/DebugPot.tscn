@@ -7,59 +7,140 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource("1_dp")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-offset_left = 80.0
-offset_top = 80.0
-offset_right = 800.0
-offset_bottom = 900.0
-theme_override_constants/separation = 20
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 60.0
+offset_top = 40.0
+offset_right = -60.0
+offset_bottom = -40.0
+theme_override_constants/separation = 80
 
-[node name="LabelTitle" type="Label" parent="VBoxContainer"]
-theme_override_font_sizes/font_size = 42
+[node name="LeftColumn" type="VBoxContainer" parent="HBoxContainer"]
+custom_minimum_size = Vector2(560, 0)
+theme_override_constants/separation = 8
+
+[node name="LabelTitle" type="Label" parent="HBoxContainer/LeftColumn"]
+theme_override_font_sizes/font_size = 28
 text = "=== 鍋 デバッグ UI ==="
 
-[node name="LabelVolume" type="Label" parent="VBoxContainer"]
+[node name="LabelSectionPot" type="Label" parent="HBoxContainer/LeftColumn"]
+theme_override_font_sizes/font_size = 20
+text = "─── 鍋の状態 ───"
+
+[node name="LabelVolume" type="Label" parent="HBoxContainer/LeftColumn"]
 unique_name_in_owner = true
-theme_override_font_sizes/font_size = 36
+theme_override_font_sizes/font_size = 26
 text = "volume : --"
 
-[node name="LabelRich" type="Label" parent="VBoxContainer"]
+[node name="LabelRich" type="Label" parent="HBoxContainer/LeftColumn"]
 unique_name_in_owner = true
-theme_override_font_sizes/font_size = 36
+theme_override_font_sizes/font_size = 26
 text = "rich   : --"
 
-[node name="LabelLight" type="Label" parent="VBoxContainer"]
+[node name="LabelLight" type="Label" parent="HBoxContainer/LeftColumn"]
 unique_name_in_owner = true
-theme_override_font_sizes/font_size = 36
+theme_override_font_sizes/font_size = 26
 text = "light  : --"
 
-[node name="LabelUmami" type="Label" parent="VBoxContainer"]
+[node name="LabelUmami" type="Label" parent="HBoxContainer/LeftColumn"]
 unique_name_in_owner = true
-theme_override_font_sizes/font_size = 36
+theme_override_font_sizes/font_size = 26
 text = "umami  : --"
 
-[node name="LabelStatus" type="Label" parent="VBoxContainer"]
+[node name="LabelStatus" type="Label" parent="HBoxContainer/LeftColumn"]
 unique_name_in_owner = true
-theme_override_font_sizes/font_size = 40
+theme_override_font_sizes/font_size = 26
 text = ""
 
-[node name="BtnSetup" type="Button" parent="VBoxContainer"]
-theme_override_font_sizes/font_size = 30
+[node name="LabelSectionIngredients" type="Label" parent="HBoxContainer/LeftColumn"]
+theme_override_font_sizes/font_size = 20
+text = "─── 食材 ───"
+
+[node name="BtnSelectBase" type="Button" parent="HBoxContainer/LeftColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(540, 44)
+theme_override_font_sizes/font_size = 22
+text = "ベース [▶]  豚骨  r=5 l=0 u=3"
+alignment = 0
+
+[node name="BtnSetup" type="Button" parent="HBoxContainer/LeftColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(540, 44)
+theme_override_font_sizes/font_size = 22
 text = "[仕込み direct]"
 
-[node name="BtnServe" type="Button" parent="VBoxContainer"]
+[node name="BtnSelectTopping" type="Button" parent="HBoxContainer/LeftColumn"]
 unique_name_in_owner = true
-theme_override_font_sizes/font_size = 30
+custom_minimum_size = Vector2(540, 44)
+theme_override_font_sizes/font_size = 22
+text = "トッピング [▶]  なし"
+alignment = 0
+
+[node name="BtnSelectYakumi" type="Button" parent="HBoxContainer/LeftColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(540, 44)
+theme_override_font_sizes/font_size = 22
+text = "薬味 [▶]  なし"
+alignment = 0
+
+[node name="BtnServe" type="Button" parent="HBoxContainer/LeftColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(540, 44)
+theme_override_font_sizes/font_size = 22
 text = "[提供 serve]"
 
-[node name="BtnTurnEnd" type="Button" parent="VBoxContainer"]
-theme_override_font_sizes/font_size = 30
+[node name="LabelSectionControls" type="Label" parent="HBoxContainer/LeftColumn"]
+theme_override_font_sizes/font_size = 20
+text = "─── 操作 ───"
+
+[node name="BtnTurnEnd" type="Button" parent="HBoxContainer/LeftColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(540, 44)
+theme_override_font_sizes/font_size = 22
 text = "[ターン経過 on_turn_end]"
 
-[node name="BtnAddWater" type="Button" parent="VBoxContainer"]
-theme_override_font_sizes/font_size = 30
+[node name="BtnAddWater" type="Button" parent="HBoxContainer/LeftColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(540, 44)
+theme_override_font_sizes/font_size = 22
 text = "[水を差す add_water]"
 
-[node name="BtnReset" type="Button" parent="VBoxContainer"]
-theme_override_font_sizes/font_size = 30
-text = "[リセット]  ← 空鍋（売り切れテスト）"
+[node name="BtnReset" type="Button" parent="HBoxContainer/LeftColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(540, 44)
+theme_override_font_sizes/font_size = 22
+text = "[リセット]  ← 空鍋"
+
+[node name="RightColumn" type="VBoxContainer" parent="HBoxContainer"]
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="LabelSectionCustomer" type="Label" parent="HBoxContainer/RightColumn"]
+theme_override_font_sizes/font_size = 20
+text = "─── 客 ───"
+
+[node name="BtnSwitchCustomer" type="Button" parent="HBoxContainer/RightColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 44)
+theme_override_font_sizes/font_size = 22
+text = "[客を切り替え]"
+
+[node name="LabelCustomerName" type="Label" parent="HBoxContainer/RightColumn"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 28
+text = "-- (--/--)"
+
+[node name="LabelIdeal" type="Label" parent="HBoxContainer/RightColumn"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 24
+text = "ideal: --"
+
+[node name="LabelSectionResult" type="Label" parent="HBoxContainer/RightColumn"]
+theme_override_font_sizes/font_size = 20
+text = "─── 評価結果 ───"
+
+[node name="LabelResult" type="Label" parent="HBoxContainer/RightColumn"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 28
+text = "（提供後に更新）"

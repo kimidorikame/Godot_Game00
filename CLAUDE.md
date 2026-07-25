@@ -47,12 +47,12 @@ res://
 │   ├── prep/                # 仕込み（昼）
 │   └── ui/                  # 共通UI部品
 └── assets/
-    ├── fonts/
-    ├── images/
-    │   ├── bg/
-    │   └── chara/
-    ├── bgm/
-    └── sfx/
+	├── fonts/
+	├── images/
+	│   ├── bg/
+	│   └── chara/
+	├── bgm/
+	└── sfx/
 ```
 
 ## 画面遷移
@@ -60,9 +60,9 @@ res://
 ```
 scenes/title/Title.tscn
   ──[NEWGAME]──► scenes/night/Game.tscn
-                   ──[営業終了]──► scenes/home/Result.tscn
-                                     ──[翌日へ]──► scenes/night/Game.tscn
-                                     ──[タイトルへ]──► scenes/title/Title.tscn
+				   ──[営業終了]──► scenes/home/Result.tscn
+									 ──[翌日へ]──► scenes/night/Game.tscn
+									 ──[タイトルへ]──► scenes/title/Title.tscn
 ```
 
 ## 命名規則
