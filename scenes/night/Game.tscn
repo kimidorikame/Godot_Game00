@@ -1,0 +1,23 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/night/game.gd" id="1_g"]
+
+[node name="Game" type="Node2D"]
+script = ExtResource("1_g")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Label" type="Label" parent="CanvasLayer"]
+offset_left = 80.0
+offset_top = 80.0
+offset_right = 800.0
+offset_bottom = 160.0
+theme_override_font_sizes/font_size = 48
+text = "本編（仮）"
+
+[node name="EndDayButton" type="Button" parent="CanvasLayer"]
+offset_left = 80.0
+offset_top = 200.0
+offset_right = 320.0
+offset_bottom = 260.0
+text = "営業終了（仮）"

@@ -1,0 +1,27 @@
+# Godot 4.x — .gitignore
+
+# エディタ・エンジンの自動生成物
+.godot/
+
+# エクスポートしたバイナリ
+/android/
+/ios/
+/web/
+/windows/
+/macos/
+/linux/
+
+# エクスポートプリセット（認証情報を含む場合があるため除外）
+export_presets.cfg
+
+# セーブデータ（user:// は OS のユーザーフォルダに置かれるが念のため）
+*.save
+*.sav
+
+# OS 生成ファイル
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# エディタ設定（個人設定のため任意。チームで共有する場合はコメントアウト）
+# .editorconfig
