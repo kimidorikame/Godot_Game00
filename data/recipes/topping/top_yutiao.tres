@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="RecipeResource" load_steps=4 format=3]
+
+[ext_resource type="Script" uid="uid://dxy3bghloix45" path="res://resources/recipe_resource.gd" id="1_recipe"]
+[ext_resource type="Script" uid="uid://ca3rhbtpy7235" path="res://core/soup_attrs.gd" id="2_attrs"]
+
+[sub_resource type="Resource" id="SoupAttrs_1"]
+script = ExtResource("2_attrs")
+rich = 1
+light = 0
+umami = 0
+
+[resource]
+script = ExtResource("1_recipe")
+id = &"top_yutiao"
+display_name = "油条"
+kind = 2
+attrs = SubResource("SoupAttrs_1")

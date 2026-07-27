@@ -11,6 +11,10 @@
 - 言語: GDScript（静的型付け徹底・class_name 全クラスに付与）
 - 会話エンジン: Dialogic 2 アドオン（自作しない）
 
+## 開発環境
+- Godot 実行ファイル（ヘッドレス実行・テスト用）:
+  `D:/soft/Godot_v4.4.1-stable_mono_win64/Godot_v4.4.1-stable_mono_win64_console.exe`
+
 ## フォルダ構成
 
 ```

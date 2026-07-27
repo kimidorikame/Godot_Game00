@@ -1,21 +1,22 @@
 extends Control
 
-# ─── 食材データ（設計書 3.2 のプレースホルダ値）────────────
-const BASE_DATA: Array = [
-	{name = "豚骨", rich = 5, light = 0, umami = 3, volume = 8},
-	{name = "精進", rich = 0, light = 5, umami = 2, volume = 8},
+# ─── 食材データ（data/recipes/ の .tres を参照）────────────
+# トッピング・薬味の先頭 null は「なし」を表す。
+var _bases: Array[RecipeResource] = [
+	preload("res://data/recipes/base/base_tonkotsu.tres"),
+	preload("res://data/recipes/base/base_shojin.tres"),
 ]
-const TOPPING_DATA: Array = [
-	{name = "なし",          rich = 0, light = 0, umami = 0},
-	{name = "油条",          rich = 1, light = 0, umami = 0},
-	{name = "厚揚げ",        rich = 1, light = 0, umami = 1},
-	{name = "チャーシュー",  rich = 2, light = 0, umami = 1},
+var _toppings: Array[RecipeResource] = [
+	null,
+	preload("res://data/recipes/topping/top_yutiao.tres"),
+	preload("res://data/recipes/topping/top_atsuage.tres"),
+	preload("res://data/recipes/topping/top_chashu.tres"),
 ]
-const YAKUMI_DATA: Array = [
-	{name = "なし",     rich =  0, light = 0, umami = 0},
-	{name = "生姜",     rich =  0, light = 1, umami = 1},
-	{name = "ニンニク", rich =  1, light = 0, umami = 2},
-	{name = "黒酢",     rich = -1, light = 1, umami = 0},
+var _yakumis: Array[RecipeResource] = [
+	null,
+	preload("res://data/recipes/yakumi/yak_shoga.tres"),
+	preload("res://data/recipes/yakumi/yak_ninniku.tres"),
+	preload("res://data/recipes/yakumi/yak_kurozu.tres"),
 ]
 
 var _pot: Pot = null
@@ -41,79 +42,35 @@ func _ready() -> void:
 
 
 func _build_customers() -> void:
-	var roujin := CustomerResource.new()
-	roujin.display_name    = "老人"
-	roujin.ideal           = _attrs(1, 5, 2)
-	roujin.great_threshold = 2
-	roujin.ok_threshold    = 5
-	roujin.base_price      = 300
-	roujin.tip             = 100
-
-	var haitatsuin := CustomerResource.new()
-	haitatsuin.display_name    = "配達員"
-	haitatsuin.ideal           = _attrs(6, 0, 4)
-	haitatsuin.great_threshold = 2
-	haitatsuin.ok_threshold    = 5
-	haitatsuin.base_price      = 250
-	haitatsuin.tip             = 80
-
-	var keiji := CustomerResource.new()
-	keiji.display_name    = "刑事（元料理人）"
-	keiji.ideal           = _attrs(3, 3, 5)
-	keiji.great_threshold = 2
-	keiji.ok_threshold    = 4
-	keiji.base_price      = 400
-	keiji.tip             = 150
-	keiji.is_pro_critic   = true
-
-	_customers = [roujin, haitatsuin, keiji]
+	_customers = [
+		preload("res://data/customers/roujin.tres"),
+		preload("res://data/customers/haitatsuin.tres"),
+		preload("res://data/customers/keiji.tres"),
+	]
 
 
 func _setup_pot() -> void:
-	var b: Dictionary = BASE_DATA[_base_index]
-	print("[_setup_pot] _base_index=%d  name=%s  r=%d l=%d u=%d" % [
-		_base_index, b.name, b.rich, b.light, b.umami])
-
-	# RecipeResource.attrs 代入を経由せず直接 Pot に設定
+	var base: RecipeResource = _bases[_base_index]
 	_pot = Pot.new()
-	_pot.attrs  = _attrs(b.rich, b.light, b.umami)
-	_pot.volume = b.volume
-
-	print("[_setup_pot] pot.attrs after setup: r=%d l=%d u=%d  vol=%d" % [
-		_pot.attrs.rich, _pot.attrs.light, _pot.attrs.umami, _pot.volume])
+	_pot.setup(base, [])
 	%LabelResult.text = "（提供後に更新）"
 	_refresh()
-
-
-func _attrs(rich: int, light: int, umami: int) -> SoupAttrs:
-	var a := SoupAttrs.new()
-	a.rich  = rich
-	a.light = light
-	a.umami = umami
-	return a
-
-
-func _make_recipe(kind: RecipeResource.Kind, data: Dictionary) -> RecipeResource:
-	var r := RecipeResource.new()
-	r.kind  = kind
-	r.attrs = _attrs(data.rich, data.light, data.umami)
-	return r
 
 
 # ─── ボタンハンドラ ────────────────────────────────────────
 
 func _on_select_base() -> void:
-	_base_index = (_base_index + 1) % BASE_DATA.size()
+	_base_index = (_base_index + 1) % _bases.size()
 	_refresh()
 
 
 func _on_select_topping() -> void:
-	_topping_index = (_topping_index + 1) % TOPPING_DATA.size()
+	_topping_index = (_topping_index + 1) % _toppings.size()
 	_refresh()
 
 
 func _on_select_yakumi() -> void:
-	_yakumi_index = (_yakumi_index + 1) % YAKUMI_DATA.size()
+	_yakumi_index = (_yakumi_index + 1) % _yakumis.size()
 	_refresh()
 
 
@@ -130,12 +87,8 @@ func _on_setup() -> void:
 func _on_serve() -> void:
 	if _pot == null or _pot.is_empty():
 		return
-	var topping: RecipeResource = null
-	if _topping_index > 0:
-		topping = _make_recipe(RecipeResource.Kind.TOPPING, TOPPING_DATA[_topping_index])
-	var yakumi: RecipeResource = null
-	if _yakumi_index > 0:
-		yakumi = _make_recipe(RecipeResource.Kind.YAKUMI, YAKUMI_DATA[_yakumi_index])
+	var topping: RecipeResource = _toppings[_topping_index]
+	var yakumi: RecipeResource = _yakumis[_yakumi_index]
 	var cup := _pot.serve(topping, yakumi)
 	var result: Evaluator.Result = Evaluator.evaluate(cup, _customers[_customer_index])
 	_show_result(cup, result)
@@ -176,24 +129,28 @@ func _show_result(cup: SoupServing, result: Evaluator.Result) -> void:
 
 func _refresh() -> void:
 	# 食材選択ボタンのテキスト更新
-	var b: Dictionary = BASE_DATA[_base_index]
-	%BtnSelectBase.text = "ベース [▶]  %s  r=%d l=%d u=%d" % [b.name, b.rich, b.light, b.umami]
+	var b: RecipeResource = _bases[_base_index]
+	%BtnSelectBase.text = "ベース [▶]  %s  r=%d l=%d u=%d" % [
+		b.display_name, b.attrs.rich, b.attrs.light, b.attrs.umami]
 
-	var t: Dictionary = TOPPING_DATA[_topping_index]
-	%BtnSelectTopping.text = "トッピング [▶]  %s" % t.name \
-		+ ("" if _topping_index == 0 else "  r%+d l%+d u%+d" % [t.rich, t.light, t.umami])
+	var t: RecipeResource = _toppings[_topping_index]
+	if t == null:
+		%BtnSelectTopping.text = "トッピング [▶]  なし"
+	else:
+		%BtnSelectTopping.text = "トッピング [▶]  %s  r%+d l%+d u%+d" % [
+			t.display_name, t.attrs.rich, t.attrs.light, t.attrs.umami]
 
-	var y: Dictionary = YAKUMI_DATA[_yakumi_index]
-	%BtnSelectYakumi.text = "薬味 [▶]  %s" % y.name \
-		+ ("" if _yakumi_index == 0 else "  r%+d l%+d u%+d" % [y.rich, y.light, y.umami])
+	var y: RecipeResource = _yakumis[_yakumi_index]
+	if y == null:
+		%BtnSelectYakumi.text = "薬味 [▶]  なし"
+	else:
+		%BtnSelectYakumi.text = "薬味 [▶]  %s  r%+d l%+d u%+d" % [
+			y.display_name, y.attrs.rich, y.attrs.light, y.attrs.umami]
 
 	if _pot == null:
-		print("[_refresh] _pot is NULL, early return")
 		return
 
 	# 鍋の状態
-	print("[_refresh] writing labels: r=%d l=%d u=%d vol=%d" % [
-		_pot.attrs.rich, _pot.attrs.light, _pot.attrs.umami, _pot.volume])
 	%LabelVolume.text = "volume : %d" % _pot.volume
 	%LabelRich.text   = "rich   : %d" % _pot.attrs.rich
 	%LabelLight.text  = "light  : %d" % _pot.attrs.light
