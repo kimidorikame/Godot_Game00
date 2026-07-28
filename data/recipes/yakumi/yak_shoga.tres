@@ -1,11 +1,10 @@
-[gd_resource type="Resource" script_class="RecipeResource" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="RecipeResource" format=3 uid="uid://dfdwv0ivbwtxr"]
 
 [ext_resource type="Script" uid="uid://dxy3bghloix45" path="res://resources/recipe_resource.gd" id="1_recipe"]
 [ext_resource type="Script" uid="uid://ca3rhbtpy7235" path="res://core/soup_attrs.gd" id="2_attrs"]
 
 [sub_resource type="Resource" id="SoupAttrs_1"]
 script = ExtResource("2_attrs")
-rich = 0
 light = 1
 umami = 1
 

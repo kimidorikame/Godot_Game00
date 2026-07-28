@@ -1,11 +1,10 @@
-[gd_resource type="Resource" script_class="RecipeResource" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="RecipeResource" format=3 uid="uid://cojd7e487flgn"]
 
 [ext_resource type="Script" uid="uid://dxy3bghloix45" path="res://resources/recipe_resource.gd" id="1_recipe"]
 [ext_resource type="Script" uid="uid://ca3rhbtpy7235" path="res://core/soup_attrs.gd" id="2_attrs"]
 
 [sub_resource type="Resource" id="SoupAttrs_1"]
 script = ExtResource("2_attrs")
-rich = 0
 light = 5
 umami = 2
 
@@ -13,6 +12,4 @@ umami = 2
 script = ExtResource("1_recipe")
 id = &"base_shojin"
 display_name = "精進"
-kind = 0
 attrs = SubResource("SoupAttrs_1")
-base_volume = 8

@@ -7,17 +7,120 @@ script = ExtResource("1_g")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
-[node name="Label" type="Label" parent="CanvasLayer"]
+[node name="Root" type="VBoxContainer" parent="CanvasLayer"]
 offset_left = 80.0
-offset_top = 80.0
-offset_right = 800.0
-offset_bottom = 160.0
-theme_override_font_sizes/font_size = 48
+offset_top = 60.0
+offset_right = 900.0
+offset_bottom = 900.0
+theme_override_constants/separation = 20
+
+[node name="LabelTitle" type="Label" parent="CanvasLayer/Root"]
+theme_override_font_sizes/font_size = 40
 text = "本編（仮）"
 
-[node name="EndDayButton" type="Button" parent="CanvasLayer"]
-offset_left = 80.0
-offset_top = 200.0
-offset_right = 320.0
-offset_bottom = 260.0
-text = "営業終了（仮）"
+[node name="LabelMoney" type="Label" parent="CanvasLayer/Root"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 24
+text = "所持金 : ----円"
+
+[node name="PrepPanel" type="VBoxContainer" parent="CanvasLayer/Root"]
+unique_name_in_owner = true
+theme_override_constants/separation = 8
+
+[node name="LabelSection" type="Label" parent="CanvasLayer/Root/PrepPanel"]
+theme_override_font_sizes/font_size = 20
+text = "─── 仕込み ───"
+
+[node name="BtnSelectBase" type="Button" parent="CanvasLayer/Root/PrepPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 44)
+theme_override_font_sizes/font_size = 22
+text = "ベース [▶]"
+alignment = 0
+
+[node name="BtnSetup" type="Button" parent="CanvasLayer/Root/PrepPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 44)
+theme_override_font_sizes/font_size = 22
+text = "[仕込む]"
+
+[node name="ConversationPanel" type="VBoxContainer" parent="CanvasLayer/Root"]
+unique_name_in_owner = true
+visible = false
+theme_override_constants/separation = 8
+
+[node name="LabelSection" type="Label" parent="CanvasLayer/Root/ConversationPanel"]
+theme_override_font_sizes/font_size = 20
+text = "─── 客 ───"
+
+[node name="LabelCustomerName" type="Label" parent="CanvasLayer/Root/ConversationPanel"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 28
+text = "--"
+
+[node name="LabelConversation" type="Label" parent="CanvasLayer/Root/ConversationPanel"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 22
+autowrap_mode = 2
+text = "（会話はまだ実装されていません。ここに Dialogic の会話が入る予定）"
+
+[node name="BtnSkipConversation" type="Button" parent="CanvasLayer/Root/ConversationPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 44)
+theme_override_font_sizes/font_size = 22
+text = "[会話をスキップ →]"
+
+[node name="ServingPanel" type="VBoxContainer" parent="CanvasLayer/Root"]
+unique_name_in_owner = true
+visible = false
+theme_override_constants/separation = 8
+
+[node name="LabelSection" type="Label" parent="CanvasLayer/Root/ServingPanel"]
+theme_override_font_sizes/font_size = 20
+text = "─── 提供 ───"
+
+[node name="LabelPotStatus" type="Label" parent="CanvasLayer/Root/ServingPanel"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 22
+text = "volume:-- rich:-- light:-- umami:--"
+
+[node name="BtnSelectTopping" type="Button" parent="CanvasLayer/Root/ServingPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 44)
+theme_override_font_sizes/font_size = 22
+text = "トッピング [▶]  なし"
+alignment = 0
+
+[node name="BtnSelectYakumi" type="Button" parent="CanvasLayer/Root/ServingPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 44)
+theme_override_font_sizes/font_size = 22
+text = "薬味 [▶]  なし"
+alignment = 0
+
+[node name="BtnServe" type="Button" parent="CanvasLayer/Root/ServingPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 44)
+theme_override_font_sizes/font_size = 22
+text = "[提供する]"
+
+[node name="ResultPanel" type="VBoxContainer" parent="CanvasLayer/Root"]
+unique_name_in_owner = true
+visible = false
+theme_override_constants/separation = 8
+
+[node name="LabelSection" type="Label" parent="CanvasLayer/Root/ResultPanel"]
+theme_override_font_sizes/font_size = 20
+text = "─── 評価結果 ───"
+
+[node name="LabelResult" type="Label" parent="CanvasLayer/Root/ResultPanel"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 24
+autowrap_mode = 2
+text = "--"
+
+[node name="BtnResultNext" type="Button" parent="CanvasLayer/Root/ResultPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 44)
+theme_override_font_sizes/font_size = 22
+text = "--"
