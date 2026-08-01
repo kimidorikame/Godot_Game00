@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="CustomerResource" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="CustomerResource" format=3 uid="uid://bguwves3xu3ih"]
 
 [ext_resource type="Script" uid="uid://t888uxwppdvu" path="res://resources/customer_resource.gd" id="1_customer"]
 [ext_resource type="Script" uid="uid://ca3rhbtpy7235" path="res://core/soup_attrs.gd" id="2_attrs"]
@@ -6,7 +6,6 @@
 [sub_resource type="Resource" id="SoupAttrs_1"]
 script = ExtResource("2_attrs")
 rich = 6
-light = 0
 umami = 4
 
 [resource]
@@ -14,7 +13,5 @@ script = ExtResource("1_customer")
 id = &"haitatsuin"
 display_name = "配達員"
 ideal = SubResource("SoupAttrs_1")
-great_threshold = 2
-ok_threshold = 5
 base_price = 250
 tip = 80

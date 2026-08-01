@@ -13,3 +13,4 @@ script = ExtResource("1_recipe")
 id = &"base_shojin"
 display_name = "精進"
 attrs = SubResource("SoupAttrs_1")
+price = 500

@@ -1,0 +1,44 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/market/shop.gd" id="1_shop"]
+
+[node name="Shop" type="Node2D"]
+script = ExtResource("1_shop")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Root" type="VBoxContainer" parent="CanvasLayer"]
+offset_left = 80.0
+offset_top = 60.0
+offset_right = 900.0
+offset_bottom = 500.0
+theme_override_constants/separation = 20
+
+[node name="LabelTitle" type="Label" parent="CanvasLayer/Root"]
+theme_override_font_sizes/font_size = 40
+text = "市場（仮）"
+
+[node name="LabelMoney" type="Label" parent="CanvasLayer/Root"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 24
+text = "所持金 : ----円"
+
+[node name="BtnBuyBase0" type="Button" parent="CanvasLayer/Root"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 44)
+theme_override_font_sizes/font_size = 22
+text = "--"
+alignment = 0
+
+[node name="BtnBuyBase1" type="Button" parent="CanvasLayer/Root"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 44)
+theme_override_font_sizes/font_size = 22
+text = "--"
+alignment = 0
+
+[node name="BtnToNight" type="Button" parent="CanvasLayer/Root"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 44)
+theme_override_font_sizes/font_size = 22
+text = "[買い物を終える →]"

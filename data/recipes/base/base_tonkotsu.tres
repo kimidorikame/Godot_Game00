@@ -13,3 +13,4 @@ script = ExtResource("1_recipe")
 id = &"base_tonkotsu"
 display_name = "豚骨"
 attrs = SubResource("SoupAttrs_1")
+price = 800

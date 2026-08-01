@@ -11,7 +11,7 @@ func _ready() -> void:
 
 func _on_newgame_pressed() -> void:
 	GameState.reset_for_new_game()
-	get_tree().change_scene_to_file("res://scenes/night/Game.tscn")
+	get_tree().change_scene_to_file("res://scenes/market/DestinationSelect.tscn")
 
 
 func _on_load_pressed() -> void:

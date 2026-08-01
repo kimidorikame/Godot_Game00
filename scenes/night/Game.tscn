@@ -60,12 +60,14 @@ text = "--"
 
 [node name="LabelConversation" type="Label" parent="CanvasLayer/Root/ConversationPanel"]
 unique_name_in_owner = true
+visible = false
 theme_override_font_sizes/font_size = 22
 autowrap_mode = 2
 text = "（会話はまだ実装されていません。ここに Dialogic の会話が入る予定）"
 
 [node name="BtnSkipConversation" type="Button" parent="CanvasLayer/Root/ConversationPanel"]
 unique_name_in_owner = true
+visible = false
 custom_minimum_size = Vector2(560, 44)
 theme_override_font_sizes/font_size = 22
 text = "[会話をスキップ →]"

@@ -1,20 +1,25 @@
 # game.gd
 # 夜営業シーン（M2 縦切り）。
 #
-# 客3人分の「仕込み → (会話プレースホルダ → サーブ → 評価 → 会計) ×3 → 営業終了」を
+# 客3人分の「仕込み → 会話（Dialogic） → サーブ → 評価 → 会計」×3 → 営業終了を
 # core/ と resources/.tres のデータに接続して通しで確認できるようにする。
-# 会話は Dialogic 未導入のため仮テキスト＋スキップボタンで代替する。
+# 会話は Dialogic タイムライン再生。今日はダミー会話1本を客に関わらず固定で再生する。
 
 class_name NightScene
 extends Node2D
 
 enum Stage { PREP, CONVERSATION, SERVING, RESULT }
 
+# 客ごと・日ごとのタイムライン切り替えは未実装。今日は老人のダミー会話1本を固定で再生する。
+const CONVERSATION_TIMELINE_ID := "d1_roujin"
+
 # ─── 食材データ（data/recipes/ の .tres を参照）────────────
-var _bases: Array[RecipeResource] = [
+# ベースは市場（Shop）で購入した在庫分だけが仕込みに使える。
+var _base_catalog: Array[RecipeResource] = [
 	preload("res://data/recipes/base/base_tonkotsu.tres"),
 	preload("res://data/recipes/base/base_shojin.tres"),
 ]
+var _bases: Array[RecipeResource] = []
 var _toppings: Array[RecipeResource] = [
 	null,
 	preload("res://data/recipes/topping/top_yutiao.tres"),
@@ -44,9 +49,11 @@ var _stage: Stage = Stage.PREP
 
 
 func _ready() -> void:
+	_bases = _base_catalog.filter(func(b: RecipeResource) -> bool:
+		return GameState.inventory.get(b.id, 0) > 0)
 	%BtnSelectBase.pressed.connect(_on_select_base)
 	%BtnSetup.pressed.connect(_on_setup)
-	%BtnSkipConversation.pressed.connect(_on_skip_conversation)
+	Dialogic.timeline_ended.connect(_on_dialogic_timeline_ended)
 	%BtnSelectTopping.pressed.connect(_on_select_topping)
 	%BtnSelectYakumi.pressed.connect(_on_select_yakumi)
 	%BtnServe.pressed.connect(_on_serve)
@@ -62,6 +69,8 @@ func _enter_stage(stage: Stage) -> void:
 	%ConversationPanel.visible = stage == Stage.CONVERSATION
 	%ServingPanel.visible = stage == Stage.SERVING
 	%ResultPanel.visible = stage == Stage.RESULT
+	if stage == Stage.CONVERSATION:
+		Dialogic.start(CONVERSATION_TIMELINE_ID)
 	_refresh()
 
 
@@ -74,13 +83,15 @@ func _on_select_base() -> void:
 
 func _on_setup() -> void:
 	var base: RecipeResource = _bases[_base_index]
+	GameState.inventory[base.id] -= 1
 	_pot = Pot.new()
 	_pot.setup(base, [])
 	_enter_stage(Stage.CONVERSATION)
 
 
-func _on_skip_conversation() -> void:
-	_enter_stage(Stage.SERVING)
+func _on_dialogic_timeline_ended() -> void:
+	if _stage == Stage.CONVERSATION:
+		_enter_stage(Stage.SERVING)
 
 
 func _on_select_topping() -> void:

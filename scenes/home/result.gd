@@ -10,7 +10,7 @@ func _ready() -> void:
 
 func _on_next_day_pressed() -> void:
 	GameState.next_day()
-	get_tree().change_scene_to_file("res://scenes/night/Game.tscn")
+	get_tree().change_scene_to_file("res://scenes/market/DestinationSelect.tscn")
 
 
 func _on_to_title_pressed() -> void:
