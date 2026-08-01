@@ -19,7 +19,9 @@ var _base_catalog: Array[RecipeResource] = [
 	preload("res://data/recipes/base/base_tonkotsu.tres"),
 	preload("res://data/recipes/base/base_shojin.tres"),
 ]
+const ZANRYU_BASE: RecipeResource = preload("res://data/recipes/base/base_zanryu.tres")
 var _bases: Array[RecipeResource] = []
+var _is_zanryu: bool = false
 var _toppings: Array[RecipeResource] = [
 	null,
 	preload("res://data/recipes/topping/top_yutiao.tres"),
@@ -51,6 +53,18 @@ var _stage: Stage = Stage.PREP
 func _ready() -> void:
 	_bases = _base_catalog.filter(func(b: RecipeResource) -> bool:
 		return GameState.inventory.get(b.id, 0) > 0)
+
+	if _bases.is_empty():
+		if _zanryu_available():
+			_bases = [ZANRYU_BASE]
+			_is_zanryu = true
+		else:
+			# NightSceneは1日1回しか生成されないため、現状のフローでは
+			# _zanryu_available() が false になる経路はまだ存在しない
+			# （M4で同日再訪の仕組みができたときのための骨組み）。
+			end_day()
+			return
+
 	%BtnSelectBase.pressed.connect(_on_select_base)
 	%BtnSetup.pressed.connect(_on_setup)
 	Dialogic.timeline_ended.connect(_on_dialogic_timeline_ended)
@@ -59,6 +73,12 @@ func _ready() -> void:
 	%BtnServe.pressed.connect(_on_serve)
 	%BtnResultNext.pressed.connect(_on_result_next)
 	_enter_stage(Stage.PREP)
+
+
+# 残り湯フォールバックが使えるか。「その日限り」の措置なので永続の残量は持たず、
+# 常にtrueを返す。同日中に複数回呼ばれる経路が生まれたらここを実装する（M4想定）。
+func _zanryu_available() -> bool:
+	return true
 
 
 # ─── ステージ遷移 ───────────────────────────────────────
@@ -83,7 +103,8 @@ func _on_select_base() -> void:
 
 func _on_setup() -> void:
 	var base: RecipeResource = _bases[_base_index]
-	GameState.inventory[base.id] -= 1
+	if not _is_zanryu:
+		GameState.inventory[base.id] -= 1
 	_pot = Pot.new()
 	_pot.setup(base, [])
 	_enter_stage(Stage.CONVERSATION)

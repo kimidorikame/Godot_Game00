@@ -7,6 +7,8 @@
 class_name DestinationSelectScreen
 extends Node2D
 
+const ZANRYU_BASE: RecipeResource = preload("res://data/recipes/base/base_zanryu.tres")
+
 
 func _ready() -> void:
 	%BtnMarket.pressed.connect(_on_market_pressed)
@@ -19,3 +21,4 @@ func _on_market_pressed() -> void:
 
 func _refresh() -> void:
 	%LabelMoney.text = "所持金 : %d円" % GameState.money
+	%LabelZanryu.text = "残り湯 : %s / 残量 %d杯" % [ZANRYU_BASE.display_name, ZANRYU_BASE.base_volume]

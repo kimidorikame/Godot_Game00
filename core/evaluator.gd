@@ -23,11 +23,13 @@ class Result extends RefCounted:
 	var grade: Evaluator.Grade
 
 	# 最も理想から外れていた属性名（&"rich" / &"light" / &"umami"）。
-	# BAD 時に「何が外れていたか」をプレイヤーにフィードバックするために使う。
+	# BAD だったときに「何が原因で不満だったか」を客のリアクションや
+	# ヒント台詞につなげるための情報（設計書9章、台詞への接続自体は未実装）。
 	var worst_axis: StringName
 
 	# worst_axis が理想より多かった（over=true）か少なかった（false）か。
-	# 「濃すぎ」か「薄すぎ」かをプレイヤーに伝えるために使う。
+	# worst_axis と組み合わせて「濃すぎた」「薄すぎた」のように
+	# 具体的な方向まで伝えられるようにするための値。
 	var over: bool
 
 	# 実際に受け取る金額（円）。グレードによって変わる。
@@ -43,8 +45,14 @@ class Result extends RefCounted:
 static func evaluate(cup: SoupServing, customer: CustomerResource) -> Result:
 	var r := Result.new()
 	# d はカップ属性と客の理想属性のマンハッタン距離（差の合計）。
+	# rich/light/umami の3軸のズレを「どっちの軸がどうずれたか」ではなく
+	# まず1つの数値にまとめたいため、単純な絶対差の合計を採用している。
 	# 距離が小さいほど客の好みに近い。
 	var d := cup.attrs.distance_to(customer.ideal)
+	# 閾値を2段階（great_threshold と ok_threshold）用意することで、
+	# 「ぴったり好み」と「許容範囲内」を分けて3段階評価にしている。
+	# 閾値そのものは客ごとの CustomerResource が持つため、
+	# 好みにシビアな客／おおらかな客の作り分けはデータ側だけで完結する。
 	if d <= customer.great_threshold:
 		r.grade = Grade.GREAT
 		r.payment = customer.base_price + customer.tip
