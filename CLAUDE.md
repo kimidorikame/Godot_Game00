@@ -63,10 +63,12 @@ res://
 
 ```
 scenes/title/Title.tscn
-  ──[NEWGAME]──► scenes/night/Game.tscn
-				   ──[営業終了]──► scenes/home/Result.tscn
-									 ──[翌日へ]──► scenes/night/Game.tscn
-									 ──[タイトルへ]──► scenes/title/Title.tscn
+  ──[NEWGAME]──► scenes/market/DestinationSelect.tscn（行き先選択・昼）
+				   ──[市場へ]──► scenes/market/Shop.tscn（市場・仕入れ）
+								   ──[夜営業へ]──► scenes/night/Game.tscn（仕込み→夜営業）
+													 ──[営業終了]──► scenes/home/Result.tscn
+																	   ──[翌日へ]──► scenes/market/DestinationSelect.tscn
+																	   ──[タイトルへ]──► scenes/title/Title.tscn
 ```
 
 ## 命名規則
@@ -81,7 +83,7 @@ scenes/title/Title.tscn
 |---|---|---|
 | M1 | コアロジック | Pot / Evaluator / SoupAttrs が UI 無しテストで動く |
 | M2 | 夜営業の縦切り | 1晩・客3人が通しプレイ可能 |
-| M3 | 昼パート | 市場・仕込み・金欠→残り湯が動く |
+| M3 | 昼パート | 市場・仕込み・金欠→残り湯が動く ✅完了 |
 | M4 | 7日ループ | セーブ・エンディング分岐まで通し可能 |
 | M5 | ポリッシュ | 本番素材・SE/BGM・演出 |
 | M6 | 体験版 | Day1〜3・客4人のビルド書き出し |
