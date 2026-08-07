@@ -12,8 +12,8 @@
 - 会話エンジン: Dialogic 2 アドオン（自作しない）
 
 ## 開発環境
-- Godot 実行ファイル（ヘッドレス実行・テスト用）:
-  `D:/soft/Godot_v4.4.1-stable_mono_win64/Godot_v4.4.1-stable_mono_win64_console.exe`
+- Godot 実行ファイル（エディタ実機プレイ・ヘッドレス実行/テスト共通、4.7.1）:
+  `E:/Steam/steamapps/common/Godot Engine/godot.windows.opt.tools.64.exe`
 
 ## フォルダ構成
 
