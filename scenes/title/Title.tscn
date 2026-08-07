@@ -9,39 +9,39 @@ script = ExtResource("2_title")
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=448921079]
 
 [node name="Label" type="Label" parent="CanvasLayer" unique_id=261403717]
-offset_left = 880.0
-offset_top = 112.0
-offset_right = 1866.0
-offset_bottom = 385.0
-theme_override_font_sizes/font_size = 200
+offset_left = 720.0
+offset_top = 47.0
+offset_right = 1224.0
+offset_bottom = 188.0
+theme_override_font_sizes/font_size = 100
 text = "GameTitle"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer" unique_id=439660165]
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 88.0
-offset_top = -515.0
-offset_right = 529.0
-offset_bottom = -9.0
+offset_left = 67.0
+offset_top = -419.0
+offset_right = 508.0
+offset_bottom = 87.0
 grow_vertical = 0
 theme_override_constants/separation = 10
 
 [node name="newgame" type="Button" parent="CanvasLayer/VBoxContainer" unique_id=2029095657]
 layout_mode = 2
-theme_override_font_sizes/font_size = 75
+theme_override_font_sizes/font_size = 40
 text = "NEWGAME"
 alignment = 2
 
 [node name="load" type="Button" parent="CanvasLayer/VBoxContainer" unique_id=1957115790]
 layout_mode = 2
-theme_override_font_sizes/font_size = 75
+theme_override_font_sizes/font_size = 40
 text = "LOAD"
 alignment = 2
 
 [node name="option" type="Button" parent="CanvasLayer/VBoxContainer" unique_id=63684368]
 layout_mode = 2
-theme_override_font_sizes/font_size = 75
+theme_override_font_sizes/font_size = 40
 text = "OPTION"
 alignment = 2
 
@@ -54,7 +54,7 @@ alignment = 2
 
 [node name="exit" type="Button" parent="CanvasLayer/VBoxContainer" unique_id=979953836]
 layout_mode = 2
-theme_override_font_sizes/font_size = 75
+theme_override_font_sizes/font_size = 40
 text = "EXIT"
 flat = true
 alignment = 2
