@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="DayScheduleResource" format=3]
+
+[ext_resource type="Script" path="res://resources/day_schedule_resource.gd" id="1_schedule"]
+
+[resource]
+script = ExtResource("1_schedule")
+day = 7
+visitors = Array[StringName](["roujin", "haitatsuin", "keiji"])
+previewed = Array[StringName]([])
+note = "M4骨子: 謎の男の実来店・2段目判定は骨子外（docs/m4_design.md参照）。roujin/haitatsuin/keiji固定"

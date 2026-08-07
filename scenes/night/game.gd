@@ -35,12 +35,17 @@ var _yakumis: Array[RecipeResource] = [
 	preload("res://data/recipes/yakumi/yak_kurozu.tres"),
 ]
 
-# ─── 客データ（data/customers/ の .tres を参照）────────────
-var _customers: Array[CustomerResource] = [
-	preload("res://data/customers/roujin.tres"),
-	preload("res://data/customers/haitatsuin.tres"),
-	preload("res://data/customers/keiji.tres"),
-]
+# ─── 客データ（GameState.day に応じて data/schedule/ から解決）──────
+# スケジュール(.tres)のvisitorsが参照するidをCustomerResourceに解決するためのカタログ。
+var _customer_catalog: Dictionary = {
+	&"roujin": preload("res://data/customers/roujin.tres"),
+	&"haitatsuin": preload("res://data/customers/haitatsuin.tres"),
+	&"keiji": preload("res://data/customers/keiji.tres"),
+}
+# スケジュール読み込みに失敗した場合の最終フォールバック（本来は起こらないはずの異常系）。
+const _FALLBACK_VISITOR_IDS: Array[StringName] = [&"roujin", &"haitatsuin", &"keiji"]
+
+var _customers: Array[CustomerResource] = []
 var _customer_index: int = 0
 
 var _pot: Pot = null
@@ -51,6 +56,8 @@ var _stage: Stage = Stage.PREP
 
 
 func _ready() -> void:
+	_customers = _load_customers_for_today()
+
 	_bases = _base_catalog.filter(func(b: RecipeResource) -> bool:
 		return GameState.inventory.get(b.id, 0) > 0)
 
@@ -79,6 +86,36 @@ func _ready() -> void:
 # 常にtrueを返す。同日中に複数回呼ばれる経路が生まれたらここを実装する（M4想定）。
 func _zanryu_available() -> bool:
 	return true
+
+
+# GameState.day のスケジュール(.tres)からその日の客リストを解決する。
+# スケジュール欠落は7日分揃っていれば本来起こらない開発中の不具合（配置ミス・typo）なので
+# assertで即気づけるようにしつつ、本番実行がクラッシュしないよう固定3人にフォールバックする。
+func _load_customers_for_today() -> Array[CustomerResource]:
+	var path := "res://data/schedule/day%d.tres" % GameState.day
+	var schedule: Resource = load(path)
+	assert(schedule is DayScheduleResource, "スケジュールが読み込めません: %s" % path)
+
+	if not (schedule is DayScheduleResource):
+		push_error("スケジュールが読み込めないため固定客リストにフォールバックします: %s" % path)
+		return _resolve_customers(_FALLBACK_VISITOR_IDS)
+
+	return _resolve_customers((schedule as DayScheduleResource).visitors)
+
+
+# 客id(StringName)の配列をカタログでCustomerResourceに解決する。
+# カタログ未登録のidは開発中の不具合（客データのtypo等）なのでassert、
+# 本番実行時はその客だけ無視して続行する。
+func _resolve_customers(visitor_ids: Array[StringName]) -> Array[CustomerResource]:
+	var result: Array[CustomerResource] = []
+	for id: StringName in visitor_ids:
+		var customer: CustomerResource = _customer_catalog.get(id)
+		assert(customer != null, "客カタログに未登録のid: %s" % id)
+		if customer == null:
+			push_error("客カタログに未登録のidのため無視します: %s" % id)
+			continue
+		result.append(customer)
+	return result
 
 
 # ─── ステージ遷移 ───────────────────────────────────────

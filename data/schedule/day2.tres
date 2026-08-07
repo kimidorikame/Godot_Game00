@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="DayScheduleResource" format=3]
+
+[ext_resource type="Script" path="res://resources/day_schedule_resource.gd" id="1_schedule"]
+
+[resource]
+script = ExtResource("1_schedule")
+day = 2
+visitors = Array[StringName](["roujin", "haitatsuin", "keiji"])
+previewed = Array[StringName]([])
+note = "M4骨子: 客データ未拡充のため全日共通の仮データ（roujin/haitatsuin/keiji固定）"
