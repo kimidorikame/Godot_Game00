@@ -22,7 +22,7 @@ func _on_to_title_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/title/Title.tscn")
 
 
-# TODO(M4-4): Day7判定（reputation閾値）とEnding.tscnへの遷移をここに実装する。
-# ステップ3時点では受け皿のみ（実際の遷移は行わない。セーブもしない）。
+# Day7はクリア後のためセーブしない。
 func _handle_day7_ending() -> void:
-	push_warning("Day7エンディング未実装（M4-4で対応）")
+	GameState.last_ending = GameState.ending_for_reputation(GameState.reputation)
+	get_tree().change_scene_to_file("res://scenes/home/Ending.tscn")
