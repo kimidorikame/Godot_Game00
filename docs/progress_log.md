@@ -101,3 +101,27 @@ M4（セーブ・7日ループ）へ。`save_manager.gd` は中身が空のま�
 - クズ食材ベース（本案・M4以降）: 継続的困窮からの脱出動線、取得条件つき・持ち越しあり
 
 M4のセーブ/7日ループ実装時に、この脱出動線も同時に設計・実装する。
+
+---
+
+### 追記（同日 or 別日）: M4ステップ4完了（Day7判定＋エンディング分岐）
+
+**やったこと**
+
+M4骨子の5ステップのうちステップ4（Day7判定＋エンディング専用シーン）を実装・コミット（`7b02ce6`）。
+
+- `game_state.gd`: `enum Ending { A, B }` と受け渡し用 `last_ending`、判定純粋関数 `static func ending_for_reputation(rep)` を追加。判定は評判1軸の1段階のみ（`rep >= 5` で A、未満で B）。`save()` のホワイトリストは変更せず、`last_ending`・`phase` はともにセーブ対象外
+- `scenes/home/ending.gd`（`class_name EndingScene`）＋ `Ending.tscn` を新規作成。Result と同じ流儀。A/Bで仮テキスト差し替え、ボタンはタイトルへ戻すのみ
+- `result.gd`: `_handle_day7_ending()` のスタブを実装。Day7判定時に `day` がまだ7の状態で走る配線を維持（`next_day()` の前に判定）。Day7はセーブしない
+- 閾値境界の使い捨てテスト（rep=5→A/4→B/0→B/100→A）で全PASSを確認後、テストファイルは削除
+
+**設計上の判断（why）**
+
+- 判定関数を `game_state.gd` の `static func` に置いたのは、シーンをインスタンス化せずテストできるようにするため（当初計画では `result.gd` 配置だったが、テスト容易性を優先して変更）
+- エンディング結果の受け渡しは `change_scene_to_file` が引数を取れないため、`GameState.last_ending` 経由（遷移先の `_ready()` で読む）
+
+**保留・次の一手**
+
+- ステップ4の実機シーン遷移（Day7 Result→Ending→Title）は目視未確認。ステップ3の実機未確認分（Result配線）と合わせて、ステップ5完了後に「NEWGAME→7日→エンディング→タイトル→CONTINUE」の通しでまとめて確認する
+- 残るはステップ5（タイトルの NEWGAME/CONTINUE 呼び分け）のみでM4骨子完成。`load_game()` 接続と、CONTINUE成功時に保存日の昼へ、失敗時はボタン無効化
+- エンディングの本テキスト、2段目判定（謎の男の実来店＋最後の一杯GREAT）、客データ拡充・会話出し分けは引き続き骨子外
