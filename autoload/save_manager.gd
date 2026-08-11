@@ -1,6 +1,6 @@
 extends Node
 
-const SAVE_PATH := "user://save.json"
+const AUTO_SAVE_PATH := "user://save.json"
 
 
 func save() -> bool:
@@ -11,7 +11,7 @@ func save() -> bool:
 		"inventory": GameState.inventory,
 		"story_flags": GameState.story_flags,
 	}
-	var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	var file := FileAccess.open(AUTO_SAVE_PATH, FileAccess.WRITE)
 	if file == null:
 		return false
 	file.store_string(JSON.stringify(data))
@@ -19,13 +19,13 @@ func save() -> bool:
 
 
 func has_save() -> bool:
-	return FileAccess.file_exists(SAVE_PATH)
+	return FileAccess.file_exists(AUTO_SAVE_PATH)
 
 
 func load_game() -> bool:
-	if not FileAccess.file_exists(SAVE_PATH):
+	if not FileAccess.file_exists(AUTO_SAVE_PATH):
 		return false
-	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	var file := FileAccess.open(AUTO_SAVE_PATH, FileAccess.READ)
 	if file == null:
 		return false
 

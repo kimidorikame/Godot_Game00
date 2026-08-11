@@ -21,7 +21,7 @@ func _run() -> void:
 	# b. save() → 戻り値とファイル存在を確認
 	var save_ok: bool = SaveManager.save()
 	_check("save()の戻り値がtrue", save_ok == true)
-	_check("セーブファイルが存在する", FileAccess.file_exists(SaveManager.SAVE_PATH))
+	_check("セーブファイルが存在する", FileAccess.file_exists(SaveManager.AUTO_SAVE_PATH))
 
 	# c. GameStateをリセット（ロードが本当に復元するか確認するため）
 	GameState.reset_for_new_game()
@@ -66,8 +66,8 @@ func _run() -> void:
 	)
 
 	# g. セーブファイルを削除してload_game()がfalseを返すか（異常系）
-	DirAccess.remove_absolute(SaveManager.SAVE_PATH)
-	_check("削除後はファイルが存在しない", not FileAccess.file_exists(SaveManager.SAVE_PATH))
+	DirAccess.remove_absolute(SaveManager.AUTO_SAVE_PATH)
+	_check("削除後はファイルが存在しない", not FileAccess.file_exists(SaveManager.AUTO_SAVE_PATH))
 
 	var day_before_failed_load: int = GameState.day
 	var load_after_delete: bool = SaveManager.load_game()
