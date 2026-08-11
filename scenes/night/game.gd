@@ -189,7 +189,25 @@ func _on_result_next() -> void:
 
 # 1日の営業終了時に呼ぶ
 func end_day() -> void:
+	_snapshot_pot_to_gamestate()
 	get_tree().change_scene_to_file("res://scenes/home/Result.tscn")
+
+
+# 営業終了時点の鍋の状態を、加工せずそのままGameStateへスナップショットする
+# （困窮脱出動線の土台。翌日以降の持ち越し判定・希釈計算はここでは行わない）。
+# _pot が null（営業が一度も始まらなかった日）の場合は明示的に0を書く。
+# 書かずに放置すると、前日以前の古いスナップショットがGameStateに残留してしまうため。
+func _snapshot_pot_to_gamestate() -> void:
+	if _pot == null:
+		GameState.pot_carryover_volume = 0
+		GameState.pot_carryover_rich = 0
+		GameState.pot_carryover_light = 0
+		GameState.pot_carryover_umami = 0
+		return
+	GameState.pot_carryover_volume = _pot.volume
+	GameState.pot_carryover_rich = _pot.attrs.rich
+	GameState.pot_carryover_light = _pot.attrs.light
+	GameState.pot_carryover_umami = _pot.attrs.umami
 
 
 # ─── 表示更新 ─────────────────────────────────────────────
