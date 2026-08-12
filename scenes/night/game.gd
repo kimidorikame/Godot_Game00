@@ -19,7 +19,10 @@ var _base_catalog: Array[RecipeResource] = [
 	preload("res://data/recipes/base/base_tonkotsu.tres"),
 	preload("res://data/recipes/base/base_shojin.tres"),
 ]
-const ZANRYU_BASE: RecipeResource = preload("res://data/recipes/base/base_zanryu.tres")
+# 残り湯（持ち越し希釈）を選んだ目印。_bases に混ぜて通常ベースと同じ選択UIで扱う。
+const ZANRYU_CARRYOVER_ID := &"zanryu_carryover"
+# 残り湯作成時に足す水の回数（Pot.add_water(times)へ渡す）。客3人前提の仮値、要調整。
+const ZANRYU_WATER_TIMES := 2
 var _bases: Array[RecipeResource] = []
 var _is_zanryu: bool = false
 var _toppings: Array[RecipeResource] = [
@@ -61,16 +64,14 @@ func _ready() -> void:
 	_bases = _base_catalog.filter(func(b: RecipeResource) -> bool:
 		return GameState.inventory.get(b.id, 0) > 0)
 
+	if GameState.pot_carryover_volume > 0:
+		_bases.append(_build_zanryu_option())
+
 	if _bases.is_empty():
-		if _zanryu_available():
-			_bases = [ZANRYU_BASE]
-			_is_zanryu = true
-		else:
-			# NightSceneは1日1回しか生成されないため、現状のフローでは
-			# _zanryu_available() が false になる経路はまだ存在しない
-			# （M4で同日再訪の仕組みができたときのための骨組み）。
-			end_day()
-			return
+		# 在庫も持ち越しの残り湯も無い日。困窮からの最終脱出手段（クズ食材、段階3）は
+		# 未実装のため、現状は開店できず休業する暫定挙動（クズ食材実装時に置き換える）。
+		end_day()
+		return
 
 	%BtnSelectBase.pressed.connect(_on_select_base)
 	%BtnSetup.pressed.connect(_on_setup)
@@ -82,10 +83,22 @@ func _ready() -> void:
 	_enter_stage(Stage.PREP)
 
 
-# 残り湯フォールバックが使えるか。「その日限り」の措置なので永続の残量は持たず、
-# 常にtrueを返す。同日中に複数回呼ばれる経路が生まれたらここを実装する（M4想定）。
-func _zanryu_available() -> bool:
-	return true
+# 前日の持ち越し（GameState.pot_carryover_*）から残り湯の選択肢を組み立てる。
+# 通常ベースと同じ _bases 配列に混ぜることで、既存の選択UI（%BtnSelectBase）を
+# そのまま流用する。attrs/base_volume に持ち越しの値をそのまま入れ、
+# 実際の希釈（add_water）は選ばれて _on_setup() が呼ばれた時点で行う。
+func _build_zanryu_option() -> RecipeResource:
+	var recipe := RecipeResource.new()
+	recipe.id = ZANRYU_CARRYOVER_ID
+	recipe.display_name = "残り湯（持ち越し）"
+	recipe.kind = RecipeResource.Kind.BASE
+	recipe.attrs = SoupAttrs.new()
+	recipe.attrs.rich = GameState.pot_carryover_rich
+	recipe.attrs.light = GameState.pot_carryover_light
+	recipe.attrs.umami = GameState.pot_carryover_umami
+	recipe.base_volume = GameState.pot_carryover_volume
+	recipe.price = 0
+	return recipe
 
 
 # GameState.day のスケジュール(.tres)からその日の客リストを解決する。
@@ -140,10 +153,13 @@ func _on_select_base() -> void:
 
 func _on_setup() -> void:
 	var base: RecipeResource = _bases[_base_index]
+	_is_zanryu = base.id == ZANRYU_CARRYOVER_ID
 	if not _is_zanryu:
 		GameState.inventory[base.id] -= 1
 	_pot = Pot.new()
 	_pot.setup(base, [])
+	if _is_zanryu:
+		_pot.add_water(ZANRYU_WATER_TIMES)
 	_enter_stage(Stage.CONVERSATION)
 
 

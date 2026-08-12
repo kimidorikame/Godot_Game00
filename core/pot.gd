@@ -64,10 +64,13 @@ func on_turn_end() -> void:
 
 # 水を差す。volume を増やし、rich と umami を薄める（下限 0）。
 # volume が少なくなってきたとき、または濃くなりすぎたときに使う手段。
-func add_water() -> void:
-	volume += WATER_VOLUME
-	attrs.rich = maxi(attrs.rich + WATER_RICH, 0)
-	attrs.umami = maxi(attrs.umami + WATER_UMAMI, 0)
+# times は適用回数（1回分の効果を times 回重ねる）。残り湯作成など、
+# 通常の水差しより大量に薄める場合に times を増やして呼ぶ。
+func add_water(times: int = 1) -> void:
+	for i in times:
+		volume += WATER_VOLUME
+		attrs.rich = maxi(attrs.rich + WATER_RICH, 0)
+		attrs.umami = maxi(attrs.umami + WATER_UMAMI, 0)
 
 
 # 鍋が空かどうかを返す。serve する前に必ずチェックすること。
