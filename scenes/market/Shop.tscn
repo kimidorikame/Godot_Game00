@@ -37,6 +37,13 @@ theme_override_font_sizes/font_size = 22
 text = "--"
 alignment = 0
 
+[node name="BtnAlley" type="Button" parent="CanvasLayer/Root"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 44)
+theme_override_font_sizes/font_size = 22
+text = "--"
+alignment = 0
+
 [node name="BtnToNight" type="Button" parent="CanvasLayer/Root"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(560, 44)

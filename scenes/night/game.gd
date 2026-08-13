@@ -18,6 +18,9 @@ const CONVERSATION_TIMELINE_ID := "d1_roujin"
 var _base_catalog: Array[RecipeResource] = [
 	preload("res://data/recipes/base/base_tonkotsu.tres"),
 	preload("res://data/recipes/base/base_shojin.tres"),
+	# base_kuzu は困窮脱出動線・段階3のクズ食材。市場「裏手」で0円入手した時のみ
+	# inventory に入るので、通常日は下の inventory フィルタで自然に選択肢から外れる。
+	preload("res://data/recipes/base/base_kuzu.tres"),
 ]
 # 残り湯（持ち越し希釈）を選んだ目印。_bases に混ぜて通常ベースと同じ選択UIで扱う。
 const ZANRYU_CARRYOVER_ID := &"zanryu_carryover"

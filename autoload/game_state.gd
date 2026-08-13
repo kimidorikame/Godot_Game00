@@ -23,6 +23,11 @@ var pot_carryover_rich: int = 0
 var pot_carryover_light: int = 0
 var pot_carryover_umami: int = 0
 
+# クズ食材(段階3)の当日1個制限。junk_reset_dayとdayの不一致で日替わりリセットを判定する。
+# 市場に再入場しても同日ならリセットしないためのガード。両方ともセーブ対象外(翌日ロード時はday不一致で自然にリセットされる)。
+var junk_taken_today: bool = false
+var junk_reset_day: int = 0
+
 
 func next_day() -> void:
 	day += 1
@@ -48,3 +53,5 @@ func reset_for_new_game() -> void:
 	pot_carryover_rich = 0
 	pot_carryover_light = 0
 	pot_carryover_umami = 0
+	junk_taken_today = false
+	junk_reset_day = 0
