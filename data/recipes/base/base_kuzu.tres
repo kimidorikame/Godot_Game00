@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="RecipeResource" format=3]
+
+[ext_resource type="Script" uid="uid://dxy3bghloix45" path="res://resources/recipe_resource.gd" id="1_recipe"]
+[ext_resource type="Script" uid="uid://ca3rhbtpy7235" path="res://core/soup_attrs.gd" id="2_attrs"]
+
+[sub_resource type="Resource" id="SoupAttrs_1"]
+script = ExtResource("2_attrs")
+; 暫定値。粗末さの表現。味スケール設計フェーズで見直し予定（docs/poverty_fallback_design.md参照）
+rich = 1
+light = 1
+
+[resource]
+script = ExtResource("1_recipe")
+id = &"base_kuzu"
+display_name = "クズ食材"
+attrs = SubResource("SoupAttrs_1")
+price = 0
