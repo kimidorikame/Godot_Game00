@@ -19,3 +19,11 @@ extends Resource
 
 # 制作メモ（例: 節目の日の演出予定など）。
 @export var note: String
+
+# 対話用客（メインにならないが店にいる客）のid。母集団 = visitors(メイン) + companions_pool
+# (対話用)。当面は空（案S運用）。将来ここに客を足すと母集団が広がる。
+@export var companions_pool: Array[StringName]
+
+# 各メイン客の同席定義。どのメインの時どんな同席パターン群から抽選するか。
+# 当面は空でよく、空なら同席なし（従来通り単独会話）としてフォールバックする想定。
+@export var companion_scenes: Array[CompanionScene]
