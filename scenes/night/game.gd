@@ -10,7 +10,8 @@ extends Node2D
 
 enum Stage { PREP, CONVERSATION, SERVING, RESULT }
 
-# 客ごと・日ごとのタイムライン切り替えは未実装。今日は老人のダミー会話1本を固定で再生する。
+# 同席抽選やデータが無い場合に再生する最終フォールバックのデフォルト会話。
+# 将来ちゃんとした会話が揃ったら再検討。
 const CONVERSATION_TIMELINE_ID := "d1_roujin"
 
 # ─── 食材データ（data/recipes/ の .tres を参照）────────────
@@ -224,7 +225,9 @@ func _enter_stage(stage: Stage) -> void:
 	%ResultPanel.visible = stage == Stage.RESULT
 	if stage == Stage.CONVERSATION:
 		_select_companions_for_current_main()
-		Dialogic.start(CONVERSATION_TIMELINE_ID)
+		var timeline_id: StringName = (_current_timeline_id
+			if _current_timeline_id != &"" else CONVERSATION_TIMELINE_ID)
+		Dialogic.start(timeline_id)
 	_refresh()
 
 
