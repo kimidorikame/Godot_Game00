@@ -54,6 +54,14 @@ const _FALLBACK_VISITOR_IDS: Array[StringName] = [&"roujin", &"haitatsuin", &"ke
 var _customers: Array[CustomerResource] = []
 var _customer_index: int = 0
 
+# ─── 同席者モデル（第2階層抽選）───────────────────────────
+# その日のスケジュール(.tres)が持つ同席定義。未定義の日はis_empty()のまま
+# （companion_scenesが空 → 常に同席なしフォールバック）。
+var _companion_scenes: Array[CompanionScene] = []
+# 現在のメイン場面の抽選結果。同席なしのときは_current_companionsが空配列。
+var _current_timeline_id: StringName = &""
+var _current_companions: Array[StringName] = []
+
 var _pot: Pot = null
 var _base_index: int = 0
 var _topping_index: int = 0
@@ -116,6 +124,7 @@ func _load_customers_for_today() -> Array[CustomerResource]:
 		push_error("スケジュールが読み込めないため固定客リストにフォールバックします: %s" % path)
 		return _resolve_customers(_FALLBACK_VISITOR_IDS)
 
+	_companion_scenes = (schedule as DayScheduleResource).companion_scenes
 	return _resolve_customers((schedule as DayScheduleResource).visitors)
 
 
@@ -134,6 +143,77 @@ func _resolve_customers(visitor_ids: Array[StringName]) -> Array[CustomerResourc
 	return result
 
 
+# ─── 同席者モデル（第2階層抽選）───────────────────────────
+# 設計メモ docs/conversation_design.md「抽選の二層構造」に対応。
+# 第1階層（母集団選出）は日データ側で確定済み（companions_pool等）。ここは第2階層、
+# メイン場面ごとに「誰が同席するか」を都度抽選する部分のみを扱う。
+
+# main_idに対応するCompanionSceneを_companion_scenesから探す。無ければnull
+# （companion_scenes未定義の日・そのメインの同席定義が無い場合はここでnullになる）。
+func _find_companion_scene(main_id: StringName) -> CompanionScene:
+	for scene: CompanionScene in _companion_scenes:
+		if scene.main == main_id:
+			return scene
+	return null
+
+
+# requiredの全フラグがGameState.story_flagsに立っているか（AND条件）。
+# requiredが空の場合は「特別パターンではない」の意味であり、ここでは呼ばれない想定。
+func _flags_satisfied(required: Array[StringName]) -> bool:
+	for flag: StringName in required:
+		if not GameState.story_flags.get(flag, false):
+			return false
+	return true
+
+
+# sceneのpatternsから1つを選ぶ。特別パターン（required_flags非空）が条件を満たせば
+# 記述順で最初の1つを優先確定（先勝ち、重み抽選はスキップ）。無ければrequired_flagsが
+# 空の通常パターンだけを対象に重み抽選する。抽選対象が無い（patternsが空、通常パターンが
+# 無い、通常パターンの合計weightが0以下）場合はnull（呼び出し側で同席なしにフォールバック）。
+func _select_companion_pattern(scene: CompanionScene) -> CompanionPattern:
+	if scene == null or scene.patterns.is_empty():
+		return null
+
+	for pattern: CompanionPattern in scene.patterns:
+		if not pattern.required_flags.is_empty() and _flags_satisfied(pattern.required_flags):
+			return pattern
+
+	var normal_patterns: Array[CompanionPattern] = []
+	var total_weight: int = 0
+	for pattern: CompanionPattern in scene.patterns:
+		if pattern.required_flags.is_empty():
+			normal_patterns.append(pattern)
+			total_weight += pattern.weight
+	if normal_patterns.is_empty() or total_weight <= 0:
+		return null
+
+	var roll: int = randi() % total_weight
+	var cumulative: int = 0
+	for pattern: CompanionPattern in normal_patterns:
+		cumulative += pattern.weight
+		if roll < cumulative:
+			return pattern
+	return null  # 理論上到達しない（防御的フォールバック）
+
+
+# 現在のメイン客（_customers[_customer_index]）について同席パターンを抽選し、
+# _current_companions / _current_timeline_id に反映する。
+# このステップではDialogic.start呼び出しは従来通り固定のまま変えない
+# （_current_timeline_idはまだ会話再生に使わず、ログ確認のみに使う）。
+func _select_companions_for_current_main() -> void:
+	var main_id: StringName = _customers[_customer_index].id
+	var scene: CompanionScene = _find_companion_scene(main_id)
+	var pattern: CompanionPattern = _select_companion_pattern(scene)
+
+	if pattern != null:
+		_current_companions = pattern.companions
+		_current_timeline_id = (pattern.timeline_ids.pick_random()
+			if not pattern.timeline_ids.is_empty() else CONVERSATION_TIMELINE_ID)
+	else:
+		_current_companions = []
+		_current_timeline_id = CONVERSATION_TIMELINE_ID
+
+
 # ─── ステージ遷移 ───────────────────────────────────────
 
 func _enter_stage(stage: Stage) -> void:
@@ -143,6 +223,7 @@ func _enter_stage(stage: Stage) -> void:
 	%ServingPanel.visible = stage == Stage.SERVING
 	%ResultPanel.visible = stage == Stage.RESULT
 	if stage == Stage.CONVERSATION:
+		_select_companions_for_current_main()
 		Dialogic.start(CONVERSATION_TIMELINE_ID)
 	_refresh()
 
