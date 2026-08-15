@@ -1,6 +1,31 @@
 [gd_resource type="Resource" script_class="DayScheduleResource" format=3]
 
 [ext_resource type="Script" path="res://resources/day_schedule_resource.gd" id="1_schedule"]
+[ext_resource type="Script" path="res://resources/companion_scene.gd" id="2_companion_scene"]
+[ext_resource type="Script" path="res://resources/companion_pattern.gd" id="3_companion_pattern"]
+
+[sub_resource type="Resource" id="CompanionPattern_1"]
+script = ExtResource("3_companion_pattern")
+companions = Array[StringName](["haitatsuin"])
+weight = 30
+timeline_ids = Array[StringName](["d1_roujin"])
+
+[sub_resource type="Resource" id="CompanionPattern_2"]
+script = ExtResource("3_companion_pattern")
+companions = Array[StringName](["keiji"])
+weight = 30
+timeline_ids = Array[StringName](["d1_roujin"])
+
+[sub_resource type="Resource" id="CompanionPattern_3"]
+script = ExtResource("3_companion_pattern")
+companions = Array[StringName]([])
+weight = 40
+timeline_ids = Array[StringName](["d1_roujin"])
+
+[sub_resource type="Resource" id="CompanionScene_1"]
+script = ExtResource("2_companion_scene")
+main = &"roujin"
+patterns = Array[CompanionPattern]([SubResource("CompanionPattern_1"), SubResource("CompanionPattern_2"), SubResource("CompanionPattern_3")])
 
 [resource]
 script = ExtResource("1_schedule")
@@ -8,3 +33,4 @@ day = 1
 visitors = Array[StringName](["roujin", "haitatsuin", "keiji"])
 previewed = Array[StringName]([])
 note = "M4骨子: 客データ未拡充のため全日共通の仮データ（roujin/haitatsuin/keiji固定）"
+companion_scenes = Array[CompanionScene]([SubResource("CompanionScene_1")])
