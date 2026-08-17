@@ -11,13 +11,20 @@
 class_name SoupAttrs
 extends Resource
 
-# rich  : スープの濃厚さ。豚骨ベースで高く、水を足すと下がる。
-# light : あっさり感。精進ベースや黒酢薬味で上がる。
-# umami : 旨味の強さ。客の満足度に大きく影響する軸。
+# rich     : スープの濃厚さ。豚骨ベースで高く、水を足すと下がる。
+# light    : あっさり感。精進ベースや黒酢薬味で上がる。
+# umami    : 旨味の強さ。客の満足度に大きく影響する軸。
+# stimulus : 刺激（パンチ⇔マイルド）。薬味が主担当。単極: 0=マイルド、高=パンチ
+# aroma    : 香り（芳醇⇔淡泊）。香味系が主担当。単極: 0=淡泊、高=芳醇
 # 3 軸の合計距離（distance_to）で客の理想との差を計算する。
 @export var rich: int = 0
 @export var light: int = 0
 @export var umami: int = 0
+@export var stimulus: int = 0
+@export var aroma: int = 0
+
+# 各軸のスケール最大値の目安。データ作成の指針＋失敗判定/UI等の基準。intに上限強制はしない。
+const TASTE_AXIS_MAX := 50
 
 
 # 別の SoupAttrs の値をこのインスタンスに加算する。
@@ -27,6 +34,8 @@ func add(other: SoupAttrs) -> void:
 	rich += other.rich
 	light += other.light
 	umami += other.umami
+	stimulus += other.stimulus
+	aroma += other.aroma
 
 
 # 別の SoupAttrs との「差のマンハッタン距離」を返す。
@@ -44,4 +53,6 @@ func duplicate_attrs() -> SoupAttrs:
 	a.rich = rich
 	a.light = light
 	a.umami = umami
+	a.stimulus = stimulus
+	a.aroma = aroma
 	return a
