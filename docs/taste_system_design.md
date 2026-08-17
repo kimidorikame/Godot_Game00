@@ -175,3 +175,68 @@ light高」という味としてイメージできない矛盾状態が数値上
   同時に壊すため、安全な刻み方（一括変更か、軸を足してから引くか等）を実装着手時に設計する
 - 移行対象データの棚卸しは現状把握済み（客ideal3・ベース3・トッピング3・薬味3、および
   セーブの `pot_carryover_*`）
+
+## 実装ステップと進め方（2026-08-17 追記）
+
+味システム4軸化を段階に分けて実装する。各ステップの検証を明確にするためスコープを絞る。
+
+### ステップ1（完了・コミット `e11611e`）
+
+`SoupAttrs` に刺激 `stimulus`・香り `aroma` の2軸と `TASTE_AXIS_MAX=50` 定数を追加。既存
+`rich`/`light`/`umami` は残し、`add()`/`duplicate_attrs()` に新軸を反映、`distance_to()` は
+据え置き（評価挙動不変）。既存テストPASS・`.tres` 互換を確認済み。器を安全に広げた過渡段階
+（5フィールド）。
+
+### ステップ2（次回実装）: rich/light→koku 統合
+
+スコープを「rich/light の2軸を koku の1軸に畳む」ことに限定する（範囲A）。刺激・香りの評価
+導入・評価2段構え（薄すぎ失敗判定）は含めない（ステップ3へ）。
+
+**方針**:
+
+- 刻み方は「一括」。中間状態（rich/light と koku の併存）は作らない。テストを安全網にして
+  1コミットで統合する。理由: 「濃厚さ」を表す軸が旧richと新kokuで二重に存在する期間を作ると、
+  どちらが正か曖昧になり判断しづらい。状態を常に明確に保つため一括で畳む
+- **評価**: `distance_to()` は koku/umami の2軸のマンハッタン距離になる（旧 rich/light/umami
+  の3軸から）。刺激・香りは器にあるが評価には入れない（`distance_to` に含めない、値も0のまま
+  据え置き）
+- **Pot**: 現状の rich 操作（煮詰まりで rich+1、水で rich-2/umami-1）を koku 操作に素直に
+  読み替える。light は元々操作していないので統合で失うものはない。定数 `WATER_RICH`→
+  `WATER_KOKU` 等をリネーム
+- **Evaluator**: `_fill_worst_axis()` の diffs 辞書（現状 rich/light/umami の3軸ハードコード）
+  を koku/umami の2軸に
+- **game.gd / soup_serving / debug_pot**: UI表示・鍋再構築（`_build_zanryu_option` 等）の
+  rich/light 参照を koku に
+- **セーブ**: `GameState.pot_carryover_rich`/`pot_carryover_light` を `pot_carryover_koku` に
+  畳む（umami はそのまま）。stimulus/aroma の持ち越しは今は足さない（ステップ3で評価に効くよう
+  になってから）。旧セーブ互換: `pot_carryover_koku` は `.get(key,0)` デフォルトで読む。旧
+  セーブ（rich/light形式）をロードすると鍋持ち越しは0になる（変換しない）。開発中のテスト
+  セーブのみ持ち越しが失われるが、以降のセーブは koku 形式で正常に持ち越せる。実害なしと判断し
+  許容。rich→koku の値変換を機械的にしない方針（下記データ）と一貫させ、セーブ値も機械変換
+  しない
+- **データ（.tres）**: 客ideal3・ベース3・トッピング3・薬味3 の koku 値を、既存の rich/light
+  のペアを見て「濃厚寄りか、さらり寄りか」で手で決め直す。ただしステップ2では暫定値でよい
+  （例: 豚骨=濃厚→koku高、精進=さらり→koku低、クズ=薄い→koku低。スケール50目安）。厳密な
+  バランス調整は数値調整フェーズ（ステップ4）で。刺激・香りの値は0のまま据え置き
+
+**作業順序（1コミット内）**: `SoupAttrs`（rich/light→koku、`distance_to` をkoku/umami計算に）
+→ `Pot`（rich操作をkoku操作に、定数リネーム）→ `Evaluator`（diffs を koku/umami に）→
+`game.gd`/`soup_serving`/`debug_pot`（参照を koku に）→ セーブ（`pot_carryover_koku` に畳む）→
+`.tres`（koku値を暫定で振る）→ テスト（`test_evaluator`/`test_pot` を koku/umami ベースに
+書き換え、実行して統合が正しいか検証）。
+
+**検証**: 統合後、テストで「koku/umami の2軸評価が意図通り動くか（GREAT/OK/BAD判定、距離
+計算）」を確認。ステップ2はスコープが koku統合に限定されるので、テストが通れば「統合が正しく
+できた」ことが明確に切り分けられる。
+
+### ステップ3（将来）: 刺激・香りの評価導入と2段構え
+
+`distance_to` を koku/umami/stimulus/aroma の4軸に拡張。刺激・香りの値を全データに振る（薬味が
+刺激主担当、香味系が香り主担当）。評価2段構え（薄すぎ絶対失敗判定＋ideal距離）を実装。
+stimulus/aroma のセーブ持ち越しもここで追加。現状食材で刺激・香りを十分動かせるかの棚卸し、
+必要なら食材追加。
+
+### ステップ4（将来）: 数値バランス調整
+
+各データの軸の値、操作の効き幅（水/煮詰まりでkokuが何変わるか）、失敗判定の具体閾値を、実
+プレイで調整して確定。
