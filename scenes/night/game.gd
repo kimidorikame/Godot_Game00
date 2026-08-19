@@ -105,8 +105,7 @@ func _build_zanryu_option() -> RecipeResource:
 	recipe.display_name = "残り湯（持ち越し）"
 	recipe.kind = RecipeResource.Kind.BASE
 	recipe.attrs = SoupAttrs.new()
-	recipe.attrs.rich = GameState.pot_carryover_rich
-	recipe.attrs.light = GameState.pot_carryover_light
+	recipe.attrs.koku = GameState.pot_carryover_koku
 	recipe.attrs.umami = GameState.pot_carryover_umami
 	recipe.base_volume = GameState.pot_carryover_volume
 	recipe.price = 0
@@ -303,13 +302,11 @@ func end_day() -> void:
 func _snapshot_pot_to_gamestate() -> void:
 	if _pot == null:
 		GameState.pot_carryover_volume = 0
-		GameState.pot_carryover_rich = 0
-		GameState.pot_carryover_light = 0
+		GameState.pot_carryover_koku = 0
 		GameState.pot_carryover_umami = 0
 		return
 	GameState.pot_carryover_volume = _pot.volume
-	GameState.pot_carryover_rich = _pot.attrs.rich
-	GameState.pot_carryover_light = _pot.attrs.light
+	GameState.pot_carryover_koku = _pot.attrs.koku
 	GameState.pot_carryover_umami = _pot.attrs.umami
 
 
@@ -318,10 +315,10 @@ func _snapshot_pot_to_gamestate() -> void:
 func _show_result(cup: SoupServing, result: Evaluator.Result) -> void:
 	var grade_str: String = ["大満足", "普通", "不満"][int(result.grade)]
 	var over_str: String = "over" if result.over else "under"
-	%LabelResult.text = "%s  |  payment=%d  rep_delta=%+d\nworst: %s(%s)  cup(r=%d l=%d u=%d)" % [
+	%LabelResult.text = "%s  |  payment=%d  rep_delta=%+d\nworst: %s(%s)  cup(koku=%d u=%d)" % [
 		grade_str, result.payment, result.rep_delta,
 		result.worst_axis, over_str,
-		cup.attrs.rich, cup.attrs.light, cup.attrs.umami,
+		cup.attrs.koku, cup.attrs.umami,
 	]
 
 
@@ -329,8 +326,8 @@ func _refresh() -> void:
 	%LabelMoney.text = "所持金 : %d円" % GameState.money
 
 	var b: RecipeResource = _bases[_base_index]
-	%BtnSelectBase.text = "ベース [▶]  %s  r=%d l=%d u=%d" % [
-		b.display_name, b.attrs.rich, b.attrs.light, b.attrs.umami]
+	%BtnSelectBase.text = "ベース [▶]  %s  koku=%d u=%d" % [
+		b.display_name, b.attrs.koku, b.attrs.umami]
 
 	var c: CustomerResource = _customers[_customer_index]
 	%LabelCustomerName.text = "%s  [%d/%d]" % [c.display_name, _customer_index + 1, _customers.size()]
@@ -339,19 +336,19 @@ func _refresh() -> void:
 	if t == null:
 		%BtnSelectTopping.text = "トッピング [▶]  なし"
 	else:
-		%BtnSelectTopping.text = "トッピング [▶]  %s  r%+d l%+d u%+d" % [
-			t.display_name, t.attrs.rich, t.attrs.light, t.attrs.umami]
+		%BtnSelectTopping.text = "トッピング [▶]  %s  koku%+d u%+d" % [
+			t.display_name, t.attrs.koku, t.attrs.umami]
 
 	var y: RecipeResource = _yakumis[_yakumi_index]
 	if y == null:
 		%BtnSelectYakumi.text = "薬味 [▶]  なし"
 	else:
-		%BtnSelectYakumi.text = "薬味 [▶]  %s  r%+d l%+d u%+d" % [
-			y.display_name, y.attrs.rich, y.attrs.light, y.attrs.umami]
+		%BtnSelectYakumi.text = "薬味 [▶]  %s  koku%+d u%+d" % [
+			y.display_name, y.attrs.koku, y.attrs.umami]
 
 	if _pot != null:
-		%LabelPotStatus.text = "volume:%d rich:%d light:%d umami:%d" % [
-			_pot.volume, _pot.attrs.rich, _pot.attrs.light, _pot.attrs.umami]
+		%LabelPotStatus.text = "volume:%d koku:%d umami:%d" % [
+			_pot.volume, _pot.attrs.koku, _pot.attrs.umami]
 
 	if _customer_index + 1 < _customers.size():
 		%BtnResultNext.text = "[次の客へ →]"

@@ -11,8 +11,7 @@ func save() -> bool:
 		"inventory": GameState.inventory,
 		"story_flags": GameState.story_flags,
 		"pot_carryover_volume": GameState.pot_carryover_volume,
-		"pot_carryover_rich": GameState.pot_carryover_rich,
-		"pot_carryover_light": GameState.pot_carryover_light,
+		"pot_carryover_koku": GameState.pot_carryover_koku,
 		"pot_carryover_umami": GameState.pot_carryover_umami,
 	}
 	var file := FileAccess.open(AUTO_SAVE_PATH, FileAccess.WRITE)
@@ -43,11 +42,12 @@ func load_game() -> bool:
 	GameState.reputation = int(data.get("reputation", 0))
 	GameState.inventory = _to_stringname_keys(data.get("inventory", {}))
 	GameState.story_flags = _to_stringname_keys(data.get("story_flags", {}))
-	# 4キーとも .get(key, 0) で読む。この4フィールド追加以前のsave.jsonにはキー自体が
+	# 3キーとも .get(key, 0) で読む。この3フィールド追加以前のsave.jsonにはキー自体が
 	# 無いため、デフォルト0で「持ち越しなし」として復元し、旧セーブを読んでも落ちないようにする。
+	# pot_carryover_koku は旧セーブ（統合前の2フィールド形式）のキーを持たないため、
+	# 旧形式のセーブをロードすると鍋持ち越しは0になる（変換しない、実害なしと許容）。
 	GameState.pot_carryover_volume = int(data.get("pot_carryover_volume", 0))
-	GameState.pot_carryover_rich = int(data.get("pot_carryover_rich", 0))
-	GameState.pot_carryover_light = int(data.get("pot_carryover_light", 0))
+	GameState.pot_carryover_koku = int(data.get("pot_carryover_koku", 0))
 	GameState.pot_carryover_umami = int(data.get("pot_carryover_umami", 0))
 	return true
 

@@ -11,14 +11,14 @@
 class_name Pot
 extends RefCounted
 
-# ターン経過ごとに rich が増える量（煮詰まりシミュレーション）。
-const KONIZUMARI_PER_TURN := 1
+# ターン経過ごとに koku が増える量（煮詰まりシミュレーション）。
+const KONIZUMARI_PER_TURN := 4
 
 # 水を差したときに増えるカップ数。
 const WATER_VOLUME := 2
 
-# 水を差したときの rich の補正値（薄まるので減る）。
-const WATER_RICH := -2
+# 水を差したときの koku の補正値（薄まるので減る）。
+const WATER_KOKU := -8
 
 # 水を差したときの umami の補正値（薄まるので減る）。
 const WATER_UMAMI := -1
@@ -57,19 +57,19 @@ func serve(topping: RecipeResource, yakumi: RecipeResource) -> SoupServing:
 
 
 # ターン経過処理。客が帰るなどゲーム内の「1ターン」が進むたびに呼ぶ。
-# 煮詰まりにより rich が KONIZUMARI_PER_TURN だけ上昇する。
+# 煮詰まりにより koku が KONIZUMARI_PER_TURN だけ上昇する。
 func on_turn_end() -> void:
-	attrs.rich += KONIZUMARI_PER_TURN
+	attrs.koku += KONIZUMARI_PER_TURN
 
 
-# 水を差す。volume を増やし、rich と umami を薄める（下限 0）。
+# 水を差す。volume を増やし、koku と umami を薄める（下限 0）。
 # volume が少なくなってきたとき、または濃くなりすぎたときに使う手段。
 # times は適用回数（1回分の効果を times 回重ねる）。残り湯作成など、
 # 通常の水差しより大量に薄める場合に times を増やして呼ぶ。
 func add_water(times: int = 1) -> void:
 	for i in times:
 		volume += WATER_VOLUME
-		attrs.rich = maxi(attrs.rich + WATER_RICH, 0)
+		attrs.koku = maxi(attrs.koku + WATER_KOKU, 0)
 		attrs.umami = maxi(attrs.umami + WATER_UMAMI, 0)
 
 

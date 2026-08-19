@@ -84,7 +84,7 @@ text = "─── 提供 ───"
 [node name="LabelPotStatus" type="Label" parent="CanvasLayer/Root/ServingPanel"]
 unique_name_in_owner = true
 theme_override_font_sizes/font_size = 22
-text = "volume:-- rich:-- light:-- umami:--"
+text = "volume:-- koku:-- umami:--"
 
 [node name="BtnSelectTopping" type="Button" parent="CanvasLayer/Root/ServingPanel"]
 unique_name_in_owner = true

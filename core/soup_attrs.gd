@@ -11,14 +11,13 @@
 class_name SoupAttrs
 extends Resource
 
-# rich     : スープの濃厚さ。豚骨ベースで高く、水を足すと下がる。
-# light    : あっさり感。精進ベースや黒酢薬味で上がる。
+# koku     : コク。濃厚⇔さらり。単極: 高いほど濃厚、水を足すと下がる、煮詰まると上がる。
 # umami    : 旨味の強さ。客の満足度に大きく影響する軸。
 # stimulus : 刺激（パンチ⇔マイルド）。薬味が主担当。単極: 0=マイルド、高=パンチ
 # aroma    : 香り（芳醇⇔淡泊）。香味系が主担当。単極: 0=淡泊、高=芳醇
-# 3 軸の合計距離（distance_to）で客の理想との差を計算する。
-@export var rich: int = 0
-@export var light: int = 0
+# 評価（distance_to）は koku/umami の2軸のみで計算する。stimulus/aroma は評価に含めない
+# （器として存在するが未使用。ステップ3で評価に組み込む）。
+@export var koku: int = 0
 @export var umami: int = 0
 @export var stimulus: int = 0
 @export var aroma: int = 0
@@ -31,18 +30,18 @@ const TASTE_AXIS_MAX := 50
 # 鍋に食材を投入するときや、サーブ時にトッピング・薬味の補正を
 # カップの属性に足す際に呼ぶ。
 func add(other: SoupAttrs) -> void:
-	rich += other.rich
-	light += other.light
+	koku += other.koku
 	umami += other.umami
 	stimulus += other.stimulus
 	aroma += other.aroma
 
 
 # 別の SoupAttrs との「差のマンハッタン距離」を返す。
-# rich・light・umami それぞれの絶対差を合計した値で、
+# koku・umami それぞれの絶対差を合計した値で、
 # Evaluator が客の理想とカップの乖離を測るために使う。
+# stimulus/aroma は器にあるが評価には含めない（ステップ3で追加予定）。
 func distance_to(other: SoupAttrs) -> int:
-	return abs(rich - other.rich) + abs(light - other.light) + abs(umami - other.umami)
+	return abs(koku - other.koku) + abs(umami - other.umami)
 
 
 # 同じ値を持つ新しい SoupAttrs インスタンスを返す。
@@ -50,8 +49,7 @@ func distance_to(other: SoupAttrs) -> int:
 # 変更してしまう。Pot.setup や Pot.serve の中で安全なコピーを作るために使う。
 func duplicate_attrs() -> SoupAttrs:
 	var a := SoupAttrs.new()
-	a.rich = rich
-	a.light = light
+	a.koku = koku
 	a.umami = umami
 	a.stimulus = stimulus
 	a.aroma = aroma

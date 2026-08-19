@@ -33,15 +33,10 @@ unique_name_in_owner = true
 theme_override_font_sizes/font_size = 26
 text = "volume : --"
 
-[node name="LabelRich" type="Label" parent="HBoxContainer/LeftColumn"]
+[node name="LabelKoku" type="Label" parent="HBoxContainer/LeftColumn"]
 unique_name_in_owner = true
 theme_override_font_sizes/font_size = 26
-text = "rich   : --"
-
-[node name="LabelLight" type="Label" parent="HBoxContainer/LeftColumn"]
-unique_name_in_owner = true
-theme_override_font_sizes/font_size = 26
-text = "light  : --"
+text = "koku   : --"
 
 [node name="LabelUmami" type="Label" parent="HBoxContainer/LeftColumn"]
 unique_name_in_owner = true
@@ -61,7 +56,7 @@ text = "─── 食材 ───"
 unique_name_in_owner = true
 custom_minimum_size = Vector2(540, 44)
 theme_override_font_sizes/font_size = 22
-text = "ベース [▶]  豚骨  r=5 l=0 u=3"
+text = "ベース [▶]  豚骨  koku=40 u=3"
 alignment = 0
 
 [node name="BtnSetup" type="Button" parent="HBoxContainer/LeftColumn"]

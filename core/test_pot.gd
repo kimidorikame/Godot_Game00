@@ -8,12 +8,12 @@ func _ready() -> void:
 
 
 func _run() -> void:
-	# ベーススープ（豚骨: rich=5, umami=3, 8杯）
+	# ベーススープ（豚骨: koku=40, umami=3, 8杯）
 	var base := RecipeResource.new()
 	base.id = &"base_tonkotsu"
 	base.kind = RecipeResource.Kind.BASE
 	base.attrs = SoupAttrs.new()
-	base.attrs.rich = 5
+	base.attrs.koku = 40
 	base.attrs.umami = 3
 	base.base_volume = 8
 
@@ -23,18 +23,17 @@ func _run() -> void:
 	shiitake.attrs = SoupAttrs.new()
 	shiitake.attrs.umami = 2
 
-	# トッピング（揚げパン: rich+1）
+	# トッピング（揚げパン: koku+5）
 	var youtiao := RecipeResource.new()
 	youtiao.kind = RecipeResource.Kind.TOPPING
 	youtiao.attrs = SoupAttrs.new()
-	youtiao.attrs.rich = 1
+	youtiao.attrs.koku = 5
 
-	# 薬味（黒酢: rich-1, light+1）
+	# 薬味（黒酢: koku+0。旧2軸形式の引き算効果は今回は殺す。ステップ3以降で再検討）
 	var kurozu := RecipeResource.new()
 	kurozu.kind = RecipeResource.Kind.YAKUMI
 	kurozu.attrs = SoupAttrs.new()
-	kurozu.attrs.rich = -1
-	kurozu.attrs.light = 1
+	kurozu.attrs.koku = 0
 
 	var pot := Pot.new()
 
@@ -69,12 +68,12 @@ func _run() -> void:
 
 
 func _print_pot(pot: Pot) -> void:
-	print("  鍋  volume=%-2d  rich=%-2d  light=%-2d  umami=%d" % [
-		pot.volume, pot.attrs.rich, pot.attrs.light, pot.attrs.umami
+	print("  鍋  volume=%-2d  koku=%-2d  umami=%d" % [
+		pot.volume, pot.attrs.koku, pot.attrs.umami
 	])
 
 
 func _print_cup(label: String, cup: SoupServing) -> void:
-	print("  %-4s rich=%-2d  light=%-2d  umami=%d" % [
-		label, cup.attrs.rich, cup.attrs.light, cup.attrs.umami
+	print("  %-4s koku=%-2d  umami=%d" % [
+		label, cup.attrs.koku, cup.attrs.umami
 	])

@@ -15,7 +15,7 @@ extends Resource
 # UI や会話で表示する客の名前。
 @export var display_name: String
 
-# 客が「理想」とするスープの属性値（rich / light / umami）。
+# 客が「理想」とするスープの属性値（koku / umami）。
 # Evaluator がカップとの距離を計算する基準点になる。
 @export var ideal: SoupAttrs
 

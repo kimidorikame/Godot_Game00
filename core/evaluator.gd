@@ -22,7 +22,7 @@ class Result extends RefCounted:
 	# 満足度グレード（GREAT / OK / BAD）。
 	var grade: Evaluator.Grade
 
-	# 最も理想から外れていた属性名（&"rich" / &"light" / &"umami"）。
+	# 最も理想から外れていた属性名（&"koku" / &"umami"）。
 	# BAD だったときに「何が原因で不満だったか」を客のリアクションや
 	# ヒント台詞につなげるための情報（設計書9章、台詞への接続自体は未実装）。
 	var worst_axis: StringName
@@ -45,7 +45,7 @@ class Result extends RefCounted:
 static func evaluate(cup: SoupServing, customer: CustomerResource) -> Result:
 	var r := Result.new()
 	# d はカップ属性と客の理想属性のマンハッタン距離（差の合計）。
-	# rich/light/umami の3軸のズレを「どっちの軸がどうずれたか」ではなく
+	# koku/umami の2軸のズレを「どっちの軸がどうずれたか」ではなく
 	# まず1つの数値にまとめたいため、単純な絶対差の合計を採用している。
 	# 距離が小さいほど客の好みに近い。
 	var d := cup.attrs.distance_to(customer.ideal)
@@ -69,15 +69,14 @@ static func evaluate(cup: SoupServing, customer: CustomerResource) -> Result:
 	return r
 
 
-# 3 軸（rich / light / umami）のうち最も差が大きかったものを Result に書き込む。
+# 2 軸（koku / umami）のうち最も差が大きかったものを Result に書き込む。
 # evaluate() の内部処理として呼ばれ、直接呼ぶ場面はない。
 static func _fill_worst_axis(r: Result, cup: SoupServing, c: CustomerResource) -> void:
 	var diffs := {
-		&"rich":  cup.attrs.rich  - c.ideal.rich,
-		&"light": cup.attrs.light - c.ideal.light,
+		&"koku":  cup.attrs.koku  - c.ideal.koku,
 		&"umami": cup.attrs.umami - c.ideal.umami,
 	}
-	var worst: StringName = &"rich"
+	var worst: StringName = &"koku"
 	for k: StringName in diffs:
 		if abs(diffs[k]) > abs(diffs[worst]):
 			worst = k

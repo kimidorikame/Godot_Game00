@@ -120,40 +120,39 @@ func _on_reset() -> void:
 func _show_result(cup: SoupServing, result: Evaluator.Result) -> void:
 	var grade_str: String = ["大満足", "普通", "不満"][int(result.grade)]
 	var over_str: String  = "over" if result.over else "under"
-	%LabelResult.text = "%s  |  payment=%d  rep_delta=%+d\nworst: %s(%s)  cup(r=%d l=%d u=%d)" % [
+	%LabelResult.text = "%s  |  payment=%d  rep_delta=%+d\nworst: %s(%s)  cup(koku=%d u=%d)" % [
 		grade_str, result.payment, result.rep_delta,
 		result.worst_axis, over_str,
-		cup.attrs.rich, cup.attrs.light, cup.attrs.umami,
+		cup.attrs.koku, cup.attrs.umami,
 	]
 
 
 func _refresh() -> void:
 	# 食材選択ボタンのテキスト更新
 	var b: RecipeResource = _bases[_base_index]
-	%BtnSelectBase.text = "ベース [▶]  %s  r=%d l=%d u=%d" % [
-		b.display_name, b.attrs.rich, b.attrs.light, b.attrs.umami]
+	%BtnSelectBase.text = "ベース [▶]  %s  koku=%d u=%d" % [
+		b.display_name, b.attrs.koku, b.attrs.umami]
 
 	var t: RecipeResource = _toppings[_topping_index]
 	if t == null:
 		%BtnSelectTopping.text = "トッピング [▶]  なし"
 	else:
-		%BtnSelectTopping.text = "トッピング [▶]  %s  r%+d l%+d u%+d" % [
-			t.display_name, t.attrs.rich, t.attrs.light, t.attrs.umami]
+		%BtnSelectTopping.text = "トッピング [▶]  %s  koku%+d u%+d" % [
+			t.display_name, t.attrs.koku, t.attrs.umami]
 
 	var y: RecipeResource = _yakumis[_yakumi_index]
 	if y == null:
 		%BtnSelectYakumi.text = "薬味 [▶]  なし"
 	else:
-		%BtnSelectYakumi.text = "薬味 [▶]  %s  r%+d l%+d u%+d" % [
-			y.display_name, y.attrs.rich, y.attrs.light, y.attrs.umami]
+		%BtnSelectYakumi.text = "薬味 [▶]  %s  koku%+d u%+d" % [
+			y.display_name, y.attrs.koku, y.attrs.umami]
 
 	if _pot == null:
 		return
 
 	# 鍋の状態
 	%LabelVolume.text = "volume : %d" % _pot.volume
-	%LabelRich.text   = "rich   : %d" % _pot.attrs.rich
-	%LabelLight.text  = "light  : %d" % _pot.attrs.light
+	%LabelKoku.text   = "koku   : %d" % _pot.attrs.koku
 	%LabelUmami.text  = "umami  : %d" % _pot.attrs.umami
 
 	if _pot.is_empty():
@@ -168,7 +167,7 @@ func _refresh() -> void:
 	%LabelCustomerName.text = "%s  [%d/%d]" % [
 		c.display_name, _customer_index + 1, _customers.size()
 	]
-	%LabelIdeal.text = "ideal: r=%-2d  l=%-2d  u=%-2d  |  great≤%d  ok≤%d" % [
-		c.ideal.rich, c.ideal.light, c.ideal.umami,
+	%LabelIdeal.text = "ideal: koku=%-2d  u=%-2d  |  great≤%d  ok≤%d" % [
+		c.ideal.koku, c.ideal.umami,
 		c.great_threshold, c.ok_threshold,
 	]

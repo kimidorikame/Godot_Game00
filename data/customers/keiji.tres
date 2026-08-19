@@ -5,8 +5,7 @@
 
 [sub_resource type="Resource" id="SoupAttrs_1"]
 script = ExtResource("2_attrs")
-rich = 3
-light = 3
+koku = 25
 umami = 5
 
 [resource]
