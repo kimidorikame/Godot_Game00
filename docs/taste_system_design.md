@@ -187,7 +187,7 @@ light高」という味としてイメージできない矛盾状態が数値上
 据え置き（評価挙動不変）。既存テストPASS・`.tres` 互換を確認済み。器を安全に広げた過渡段階
 （5フィールド）。
 
-### ステップ2（次回実装）: rich/light→koku 統合
+### ステップ2（完了・コミット `0760590`）: rich/light→koku 統合
 
 スコープを「rich/light の2軸を koku の1軸に畳む」ことに限定する（範囲A）。刺激・香りの評価
 導入・評価2段構え（薄すぎ失敗判定）は含めない（ステップ3へ）。
@@ -229,12 +229,112 @@ light高」という味としてイメージできない矛盾状態が数値上
 計算）」を確認。ステップ2はスコープが koku統合に限定されるので、テストが通れば「統合が正しく
 できた」ことが明確に切り分けられる。
 
-### ステップ3（将来）: 刺激・香りの評価導入と2段構え
+### ステップ3（次回以降）: 刺激・香りの評価導入
 
-`distance_to` を koku/umami/stimulus/aroma の4軸に拡張。刺激・香りの値を全データに振る（薬味が
-刺激主担当、香味系が香り主担当）。評価2段構え（薄すぎ絶対失敗判定＋ideal距離）を実装。
-stimulus/aroma のセーブ持ち越しもここで追加。現状食材で刺激・香りを十分動かせるかの棚卸し、
-必要なら食材追加。
+前回メモでは「`distance_to` を4軸に単純拡張し、評価2段構え（薄すぎ絶対失敗＋ideal距離）を足す」
+という素朴な案だった。今回、評価モデル自体を「合算距離としきい値」から「軸ごと合格判定」に
+作り替える方針に見直した（下記サブステップ3-1）。以前のstimulus/aromaセーブ持ち越し・食材
+棚卸しは、評価モデルが固まった後のサブステップ（3-2以降）に送る。
+
+#### サブステップ3-1（次回実装）: 刺激・香りの評価導入（軸ごと合格判定モデル）
+
+> 数値（Grade閾値・tolerance・客ideal・食材の刺激/香り値）はすべて暫定。ステップ4の数値
+> バランス調整で確定させる前提の仮置き。
+
+**スコープ**: 正の値による4軸評価の土台作りと `worst_axis` の4軸対応まで。引き算メカニクス・
+黒酢の再設計・客ごとの軸重み・全軸0〜50スケール統一・クリティカル二段幅は含めない（次回以降）。
+
+**評価モデルの転換**:
+
+現行の「全軸の差を合算した単一距離（`distance_to`）を閾値と比較」する方式を廃し、「各軸ごとに
+idealとの差がtolerance以内かを個別判定し、合格した軸の本数で段階を決める」方式に作り替える。
+理由: 「何軸合ったか」による段階評価は合算距離では表現できない（1軸大外し＋他ピタリ、と全軸を
+薄く外す、が同じ合計距離になり区別不能なため）。1軸ごとの合否という粒度に落とすことで、
+「どこが合っていてどこが外れているか」を評価の構造そのものに埋め込む。
+
+**軸ごと合格判定**: 各軸で `abs(cup値 - ideal値) <= tolerance[軸]` なら「その軸は合格」。
+
+**合格本数→Grade**:
+
+- 4軸合格 → GREAT（とても好み）
+- 3軸合格 → GOOD（美味しい）
+- 2軸合格 → OK（普通）
+- 1軸合格 → OK（普通）
+- 0軸合格 → BAD（イマイチ）
+
+BADは全4軸が許容幅外＝ほぼ水か全軸大外しのときのみ。食品の性質上よっぽど失敗しない限り不満には
+ならない、という設計方針の反映。
+
+**Grade拡張**: 現行3値（GREAT/OK/BAD）を4値（GREAT/GOOD/OK/BAD）に拡張。payment/rep_delta への
+波及あり。
+
+**payment/rep_delta（暫定。基本あまり儲からない、自転車操業感を意図）**:
+
+| Grade | payment | rep_delta |
+|---|---|---|
+| GREAT | base_price + tip | +1 |
+| GOOD  | base_price       | +1 |
+| OK    | base_price       | ±0 |
+| BAD   | base_price × 0.5 | -1 |
+
+GOOD と OK は支払い同額（満額）、評判のみ差を付ける。
+
+**tolerance（軸ごとの定数、既存スケールを活かす。暫定）**:
+
+- `TOLERANCE_KOKU = 8`
+- `TOLERANCE_UMAMI = 2`
+- `TOLERANCE_STIMULUS = 2`
+- `TOLERANCE_AROMA = 2`
+
+軸ごとにスケール感が違うため共通単一値ではなく軸別に持つ。全軸0〜50スケール統一はステップ4に
+送るため、それまでは軸別toleranceで既存スケールを活かす（kokuだけ他軸よりレンジが広い現状に
+合わせている）。
+
+**great_threshold/ok_threshold（距離しきい値）の廃止**: 新モデルでは合格軸本数で判定するため
+不要になる。`CustomerResource` からこの2フィールドを削除し、既存 `.tres` 3件（`keiji` の
+`ok_threshold=4` 明示指定を含む）からも該当行を削除する。`distance_to()` 自体は評価では使わなく
+なるが、デバッグ表示等での残置可否は実装時に判断する。
+
+**worst_axis**: `_fill_worst_axis()` の `diffs` 辞書を `koku`/`umami`/`stimulus`/`aroma` の
+4キーに拡張する。台詞接続（設計書9章）は未実装のままでよく、今回は4軸でworst判定が回るところ
+まで。
+
+**客idealの設計方針（キャラ性に基づく。数値は暫定・後日調整）**:
+
+- 老人（`roujin`）: あっさり・旨味高・香り高・スパイス苦手 → koku=10, umami=4, stimulus=0,
+  aroma=4
+- 配達員（`haitatsuin`）: こってり・旨味普通・香り普通・スパイス好き → koku=45, umami=4,
+  stimulus=4, aroma=2
+- 刑事・元料理人（`keiji`）: こってり・香り良い・旨味普通・スパイス普通 → koku=25, umami=5,
+  stimulus=2, aroma=4
+
+注記: 「スパイス苦手」は `ideal.stimulus=0` で表現する。今回のモデルは「苦手」と「無関心」を
+区別しないため、刺激を入れると老人はその軸を1本落とすだけになる（BADにはならない。刺激込みで
+も他3軸が合格すればGOOD止まりで着地する）。
+
+**食材のstimulus/aroma設計方針（薬味=刺激/香り主担当、香味系が香り、ベース/トッピングは控えめ。
+数値は暫定）**:
+
+- にんにく（`yak_ninniku`）: stimulus=4, aroma=2（koku=3, umami=2 は現行維持）
+- 生姜（`yak_shoga`）: stimulus=2, aroma=4（koku=0, umami=1 維持）
+- 黒酢（`yak_kurozu`）: stimulus=0, aroma=0（今回は据え置き。引き算メカニクスの再設計は次回）
+- 豚骨（`base_tonkotsu`）: aroma=2, stimulus=0
+- 精進（`base_shojin`）: aroma=1, stimulus=0
+- クズ食材（`base_kuzu`）: stimulus=0, aroma=0
+- チャーシュー（`top_chashu`）: aroma=1, stimulus=0
+- 厚揚げ（`top_atsuage`）: stimulus=0, aroma=0
+- 油条（`top_yutiao`）: stimulus=0, aroma=0
+
+**実装の触るファイル（次セッションで詰める。この文書では列挙まで）**:
+
+- `evaluator.gd`: 評価ロジック全面作り替え（軸ごと合格判定）、`Grade` enum拡張、
+  `_fill_worst_axis()` の4軸化
+- `customer_resource.gd`: `great_threshold`/`ok_threshold` 削除、コメントを4軸表記に更新
+- `soup_attrs.gd`: tolerance定数の追加、`distance_to()` の扱い（残置/削除）の判断
+- `game.gd`/`debug_pot.gd`: Grade4値のUI表示、worst表示の4軸対応
+- 各 `.tres`: 客ideal3件への stimulus/aroma 追加、食材9件への stimulus/aroma 追加、
+  `great_threshold`/`ok_threshold` 行の削除
+- テスト: `test_evaluator` を軸別合格モデルのケースに書き換え
 
 ### ステップ4（将来）: 数値バランス調整
 
