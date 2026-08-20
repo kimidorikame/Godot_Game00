@@ -583,3 +583,28 @@ kokuに統合した。
 - 評価2段構え（薄すぎ失敗判定）
 - 黒酢など引き算食材メカニクスの実装
 - 各軸の値の作り込み
+
+---
+
+## 追記（2026-08-20）: 味システム4軸化 ステップ3-1実装完了
+
+**やったこと**
+
+ステップ3-1（刺激・香りの評価導入、コミット `01105d0`）を実装。評価を軸ごと合格判定モデルへ
+全面変更した。
+
+- 各軸で `abs(cup-ideal) <= tolerance` を個別判定し、合格軸数でGrade決定
+  （4→GREAT/3→GOOD/2,1→OK/0→BAD）。GradeをGREAT/GOOD/OK/BADの4値に拡張
+- payment/rep_delta対応（GOODとOKは支払い同額、評判のみ差、自転車操業感を意図）
+- tolerance定数（koku8/umami2/stimulus2/aroma2、暫定）をsoup_attrs.gdに追加。
+  great_threshold/ok_thresholdとdistance_to()を廃止。_fill_worst_axisを4軸化
+- 客ideal3件・食材9件にstimulus/aroma値を付与（暫定、ステップ4で調整）
+- 黒酢はstimulus=0据え置き（引き算メカニクスは次サブステップ）
+
+**環境メモ**: Godotが4.7.2に統一（Steam自動更新）。バージョン統一の方針は維持、統一先が4.7.2に
+
+**次の一手**
+
+- 引き算食材メカニクス（黒酢の刺激↓）
+- 客ごとの軸重み
+- 全軸0〜50スケール統一（ステップ4）
