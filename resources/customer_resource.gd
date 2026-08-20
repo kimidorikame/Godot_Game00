@@ -19,6 +19,14 @@ extends Resource
 # Evaluator が軸ごとに tolerance 以内かを判定する基準点になる。
 @export var ideal: SoupAttrs
 
+# 軸ごとの許容幅の客別上書き。-1（デフォルト）のときは「未指定」を意味し、
+# soup_attrs.gd の共通定数（TOLERANCE_xxx）をフォールバックで使う。0以上を指定すると
+# その客だけの上書き値として使う（Evaluator参照）。上書きしたい軸だけ.tresに書けばよい。
+@export var tolerance_koku: int = -1
+@export var tolerance_umami: int = -1
+@export var tolerance_stimulus: int = -1
+@export var tolerance_aroma: int = -1
+
 # 通常時の支払い額（OK グレードのときに受け取る金額）。
 @export var base_price: int
 

@@ -49,6 +49,32 @@ func _run() -> void:
 	print("\n[老人 × 全軸大外し(0軸合格) → BAD、worst=koku(over)]")
 	_eval(_cup(40, 0, 10, 0), roujin)
 
+	# --- 客別tolerance上書き検証（サブステップ3-2）---
+	# 老人にtolerance上書き（.tresと同じ値: umami=1(狭め)/stimulus=4(広め)/aroma=1(狭め)、
+	# kokuは-1のまま共通定数(8)にフォールバック）を持たせた客を用意し、
+	# 同じカップを「共通定数のみのroujin」と評価し比べることで、
+	# フォールバック（既存roujinが変わらないこと）と上書き効果の両方を確認する。
+	var roujin_tol := CustomerResource.new()
+	roujin_tol.display_name = "老人(tolerance上書き)"
+	roujin_tol.ideal              = _attrs(10, 4, 0, 4)
+	roujin_tol.tolerance_umami    = 1
+	roujin_tol.tolerance_stimulus = 4
+	roujin_tol.tolerance_aroma    = 1
+	roujin_tol.base_price = 300
+	roujin_tol.tip        = 100
+
+	print("\n[老人(共通定数) × umamiズレ2(共通tolerance=2で合格) → GREAT]")
+	_eval(_cup(10, 6, 0, 4), roujin)
+
+	print("\n[老人(tolerance上書きumami=1・狭め) × 同じカップ → 不合格に転じる → GOOD、worst=umami(over)]")
+	_eval(_cup(10, 6, 0, 4), roujin_tol)
+
+	print("\n[老人(共通定数) × stimulusズレ3(共通tolerance=2で不合格) → GOOD、worst=stimulus(over)]")
+	_eval(_cup(10, 4, 3, 4), roujin)
+
+	print("\n[老人(tolerance上書きstimulus=4・広め) × 同じカップ → 合格に転じる → GREAT]")
+	_eval(_cup(10, 4, 3, 4), roujin_tol)
+
 	print("\n=== テスト完了 ===")
 
 

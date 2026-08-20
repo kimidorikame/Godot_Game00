@@ -46,16 +46,18 @@ class Result extends RefCounted:
 # 軸ごと合格判定モデル: 合算した単一距離ではなく、koku/umami/stimulus/aroma の4軸
 # それぞれについて「idealとの差がtolerance以内か」を個別に判定し、合格した軸の本数で
 # グレードを決める。1軸大外し＋他ピタリ、と全軸を薄く外す、を区別できるようにするため。
+# 各軸のtoleranceは客ごとに上書き可能（CustomerResource.tolerance_xxx が -1 なら
+# soup_attrs.gd の共通定数、0以上ならその客の値を使う。_tol() で解決する）。
 static func evaluate(cup: SoupServing, customer: CustomerResource) -> Result:
 	var r := Result.new()
 	var pass_count := 0
-	if abs(cup.attrs.koku - customer.ideal.koku) <= SoupAttrs.TOLERANCE_KOKU:
+	if abs(cup.attrs.koku - customer.ideal.koku) <= _tol(customer.tolerance_koku, SoupAttrs.TOLERANCE_KOKU):
 		pass_count += 1
-	if abs(cup.attrs.umami - customer.ideal.umami) <= SoupAttrs.TOLERANCE_UMAMI:
+	if abs(cup.attrs.umami - customer.ideal.umami) <= _tol(customer.tolerance_umami, SoupAttrs.TOLERANCE_UMAMI):
 		pass_count += 1
-	if abs(cup.attrs.stimulus - customer.ideal.stimulus) <= SoupAttrs.TOLERANCE_STIMULUS:
+	if abs(cup.attrs.stimulus - customer.ideal.stimulus) <= _tol(customer.tolerance_stimulus, SoupAttrs.TOLERANCE_STIMULUS):
 		pass_count += 1
-	if abs(cup.attrs.aroma - customer.ideal.aroma) <= SoupAttrs.TOLERANCE_AROMA:
+	if abs(cup.attrs.aroma - customer.ideal.aroma) <= _tol(customer.tolerance_aroma, SoupAttrs.TOLERANCE_AROMA):
 		pass_count += 1
 
 	# 合格本数→グレード。4→GREAT, 3→GOOD, 2/1→OK, 0→BAD。
@@ -77,6 +79,12 @@ static func evaluate(cup: SoupServing, customer: CustomerResource) -> Result:
 		r.rep_delta = -1
 	_fill_worst_axis(r, cup, customer)
 	return r
+
+
+# 軸1本分のtoleranceを解決する。customer_value が -1（未指定）なら共通定数
+# default_const を、0以上ならその客の上書き値をそのまま返す。
+static func _tol(customer_value: int, default_const: int) -> int:
+	return default_const if customer_value < 0 else customer_value
 
 
 # 4軸（koku / umami / stimulus / aroma）のうち最も差が大きかったものを Result に書き込む。

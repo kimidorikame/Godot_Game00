@@ -15,5 +15,7 @@ script = ExtResource("1_customer")
 id = &"haitatsuin"
 display_name = "配達員"
 ideal = SubResource("SoupAttrs_1")
+tolerance_umami = 4
+tolerance_aroma = 4
 base_price = 250
 tip = 80
