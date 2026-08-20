@@ -313,7 +313,7 @@ func _snapshot_pot_to_gamestate() -> void:
 # ─── 表示更新 ─────────────────────────────────────────────
 
 func _show_result(cup: SoupServing, result: Evaluator.Result) -> void:
-	var grade_str: String = ["大満足", "普通", "不満"][int(result.grade)]
+	var grade_str: String = ["大満足", "美味しい", "普通", "不満"][int(result.grade)]
 	var over_str: String = "over" if result.over else "under"
 	%LabelResult.text = "%s  |  payment=%d  rep_delta=%+d\nworst: %s(%s)  cup(koku=%d u=%d)" % [
 		grade_str, result.payment, result.rep_delta,

@@ -118,7 +118,7 @@ func _on_reset() -> void:
 # ─── 表示更新 ─────────────────────────────────────────────
 
 func _show_result(cup: SoupServing, result: Evaluator.Result) -> void:
-	var grade_str: String = ["大満足", "普通", "不満"][int(result.grade)]
+	var grade_str: String = ["大満足", "美味しい", "普通", "不満"][int(result.grade)]
 	var over_str: String  = "over" if result.over else "under"
 	%LabelResult.text = "%s  |  payment=%d  rep_delta=%+d\nworst: %s(%s)  cup(koku=%d u=%d)" % [
 		grade_str, result.payment, result.rep_delta,
@@ -167,7 +167,6 @@ func _refresh() -> void:
 	%LabelCustomerName.text = "%s  [%d/%d]" % [
 		c.display_name, _customer_index + 1, _customers.size()
 	]
-	%LabelIdeal.text = "ideal: koku=%-2d  u=%-2d  |  great≤%d  ok≤%d" % [
-		c.ideal.koku, c.ideal.umami,
-		c.great_threshold, c.ok_threshold,
+	%LabelIdeal.text = "ideal: koku=%-2d  u=%-2d  s=%-2d  a=%-2d" % [
+		c.ideal.koku, c.ideal.umami, c.ideal.stimulus, c.ideal.aroma,
 	]

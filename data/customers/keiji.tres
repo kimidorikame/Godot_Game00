@@ -7,13 +7,14 @@
 script = ExtResource("2_attrs")
 koku = 25
 umami = 5
+stimulus = 2
+aroma = 4
 
 [resource]
 script = ExtResource("1_customer")
 id = &"keiji"
 display_name = "刑事（元料理人）"
 ideal = SubResource("SoupAttrs_1")
-ok_threshold = 4
 base_price = 400
 tip = 150
 is_pro_critic = true

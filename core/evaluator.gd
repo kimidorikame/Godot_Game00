@@ -12,17 +12,17 @@
 class_name Evaluator
 extends RefCounted
 
-# 満足度のグレード。GREAT（大満足）・OK（普通）・BAD（不満）の3段階。
-enum Grade { GREAT, OK, BAD }
+# 満足度のグレード。GREAT（大満足）・GOOD（美味しい）・OK（普通）・BAD（不満）の4段階。
+enum Grade { GREAT, GOOD, OK, BAD }
 
 
 # 評価結果をひとまとめにした内部クラス。
 # evaluate() の戻り値として返し、UI や GameState の更新に使う。
 class Result extends RefCounted:
-	# 満足度グレード（GREAT / OK / BAD）。
+	# 満足度グレード（GREAT / GOOD / OK / BAD）。
 	var grade: Evaluator.Grade
 
-	# 最も理想から外れていた属性名（&"koku" / &"umami"）。
+	# 最も理想から外れていた属性名（&"koku" / &"umami" / &"stimulus" / &"aroma"）。
 	# BAD だったときに「何が原因で不満だったか」を客のリアクションや
 	# ヒント台詞につなげるための情報（設計書9章、台詞への接続自体は未実装）。
 	var worst_axis: StringName
@@ -35,29 +35,39 @@ class Result extends RefCounted:
 	# 実際に受け取る金額（円）。グレードによって変わる。
 	var payment: int
 
-	# 評判の増減値。GREAT=+1, OK=±0, BAD=−1。
+	# 評判の増減値。GREAT/GOOD=+1, OK=±0, BAD=−1。
 	var rep_delta: int
 
 
 # カップと客を受け取り、評価結果（Result）を返す。
 # Pot.serve() で得た SoupServing を Evaluator.evaluate() に渡すのがメインの使い方。
 # 呼んでも鍋・客・ゲーム状態は変化しない（副作用なし）。
+#
+# 軸ごと合格判定モデル: 合算した単一距離ではなく、koku/umami/stimulus/aroma の4軸
+# それぞれについて「idealとの差がtolerance以内か」を個別に判定し、合格した軸の本数で
+# グレードを決める。1軸大外し＋他ピタリ、と全軸を薄く外す、を区別できるようにするため。
 static func evaluate(cup: SoupServing, customer: CustomerResource) -> Result:
 	var r := Result.new()
-	# d はカップ属性と客の理想属性のマンハッタン距離（差の合計）。
-	# koku/umami の2軸のズレを「どっちの軸がどうずれたか」ではなく
-	# まず1つの数値にまとめたいため、単純な絶対差の合計を採用している。
-	# 距離が小さいほど客の好みに近い。
-	var d := cup.attrs.distance_to(customer.ideal)
-	# 閾値を2段階（great_threshold と ok_threshold）用意することで、
-	# 「ぴったり好み」と「許容範囲内」を分けて3段階評価にしている。
-	# 閾値そのものは客ごとの CustomerResource が持つため、
-	# 好みにシビアな客／おおらかな客の作り分けはデータ側だけで完結する。
-	if d <= customer.great_threshold:
+	var pass_count := 0
+	if abs(cup.attrs.koku - customer.ideal.koku) <= SoupAttrs.TOLERANCE_KOKU:
+		pass_count += 1
+	if abs(cup.attrs.umami - customer.ideal.umami) <= SoupAttrs.TOLERANCE_UMAMI:
+		pass_count += 1
+	if abs(cup.attrs.stimulus - customer.ideal.stimulus) <= SoupAttrs.TOLERANCE_STIMULUS:
+		pass_count += 1
+	if abs(cup.attrs.aroma - customer.ideal.aroma) <= SoupAttrs.TOLERANCE_AROMA:
+		pass_count += 1
+
+	# 合格本数→グレード。4→GREAT, 3→GOOD, 2/1→OK, 0→BAD。
+	if pass_count == 4:
 		r.grade = Grade.GREAT
 		r.payment = customer.base_price + customer.tip
 		r.rep_delta = 1
-	elif d <= customer.ok_threshold:
+	elif pass_count == 3:
+		r.grade = Grade.GOOD
+		r.payment = customer.base_price
+		r.rep_delta = 1
+	elif pass_count >= 1:
 		r.grade = Grade.OK
 		r.payment = customer.base_price
 		r.rep_delta = 0
@@ -69,12 +79,14 @@ static func evaluate(cup: SoupServing, customer: CustomerResource) -> Result:
 	return r
 
 
-# 2 軸（koku / umami）のうち最も差が大きかったものを Result に書き込む。
+# 4軸（koku / umami / stimulus / aroma）のうち最も差が大きかったものを Result に書き込む。
 # evaluate() の内部処理として呼ばれ、直接呼ぶ場面はない。
 static func _fill_worst_axis(r: Result, cup: SoupServing, c: CustomerResource) -> void:
 	var diffs := {
-		&"koku":  cup.attrs.koku  - c.ideal.koku,
-		&"umami": cup.attrs.umami - c.ideal.umami,
+		&"koku":     cup.attrs.koku     - c.ideal.koku,
+		&"umami":    cup.attrs.umami    - c.ideal.umami,
+		&"stimulus": cup.attrs.stimulus - c.ideal.stimulus,
+		&"aroma":    cup.attrs.aroma    - c.ideal.aroma,
 	}
 	var worst: StringName = &"koku"
 	for k: StringName in diffs:

@@ -6,6 +6,8 @@
 [sub_resource type="Resource" id="SoupAttrs_1"]
 script = ExtResource("2_attrs")
 koku = 5
+stimulus = 0
+aroma = 0
 
 [resource]
 script = ExtResource("1_recipe")

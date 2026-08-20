@@ -15,17 +15,9 @@ extends Resource
 # UI や会話で表示する客の名前。
 @export var display_name: String
 
-# 客が「理想」とするスープの属性値（koku / umami）。
-# Evaluator がカップとの距離を計算する基準点になる。
+# 客が「理想」とするスープの属性値（koku / umami / stimulus / aroma の4軸）。
+# Evaluator が軸ごとに tolerance 以内かを判定する基準点になる。
 @export var ideal: SoupAttrs
-
-# カップと理想の距離がこの値以下なら GREAT（大満足）になる閾値。
-# 値が小さいほど厳しい（好みにぴったり合わないと満足しない）。
-@export var great_threshold: int = 2
-
-# カップと理想の距離がこの値以下なら OK（普通）になる閾値。
-# これを超えると BAD（不満）になる。
-@export var ok_threshold: int = 5
 
 # 通常時の支払い額（OK グレードのときに受け取る金額）。
 @export var base_price: int

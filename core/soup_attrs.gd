@@ -15,8 +15,8 @@ extends Resource
 # umami    : 旨味の強さ。客の満足度に大きく影響する軸。
 # stimulus : 刺激（パンチ⇔マイルド）。薬味が主担当。単極: 0=マイルド、高=パンチ
 # aroma    : 香り（芳醇⇔淡泊）。香味系が主担当。単極: 0=淡泊、高=芳醇
-# 評価（distance_to）は koku/umami の2軸のみで計算する。stimulus/aroma は評価に含めない
-# （器として存在するが未使用。ステップ3で評価に組み込む）。
+# 評価は4軸それぞれについて「idealとの差がtolerance以内か」を個別判定する
+# 軸ごと合格判定モデル（Evaluator参照）。
 @export var koku: int = 0
 @export var umami: int = 0
 @export var stimulus: int = 0
@@ -24,6 +24,12 @@ extends Resource
 
 # 各軸のスケール最大値の目安。データ作成の指針＋失敗判定/UI等の基準。intに上限強制はしない。
 const TASTE_AXIS_MAX := 50
+
+# 軸ごとの許容幅（Evaluatorの軸ごと合格判定で使う）。値は暫定、ステップ4の数値調整で確定する。
+const TOLERANCE_KOKU := 8
+const TOLERANCE_UMAMI := 2
+const TOLERANCE_STIMULUS := 2
+const TOLERANCE_AROMA := 2
 
 
 # 別の SoupAttrs の値をこのインスタンスに加算する。
@@ -34,14 +40,6 @@ func add(other: SoupAttrs) -> void:
 	umami += other.umami
 	stimulus += other.stimulus
 	aroma += other.aroma
-
-
-# 別の SoupAttrs との「差のマンハッタン距離」を返す。
-# koku・umami それぞれの絶対差を合計した値で、
-# Evaluator が客の理想とカップの乖離を測るために使う。
-# stimulus/aroma は器にあるが評価には含めない（ステップ3で追加予定）。
-func distance_to(other: SoupAttrs) -> int:
-	return abs(koku - other.koku) + abs(umami - other.umami)
 
 
 # 同じ値を持つ新しい SoupAttrs インスタンスを返す。
