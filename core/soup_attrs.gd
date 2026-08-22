@@ -42,6 +42,15 @@ func add(other: SoupAttrs) -> void:
 	aroma += other.aroma
 
 
+# 負の attrs を持つ食材（黒酢など）を投入した後、各軸が負にならないよう
+# 下限0で丸める。投入処理（複数回の add）の最後に1回呼ぶ。
+func clamp_to_zero() -> void:
+	koku = maxi(koku, 0)
+	umami = maxi(umami, 0)
+	stimulus = maxi(stimulus, 0)
+	aroma = maxi(aroma, 0)
+
+
 # 同じ値を持つ新しい SoupAttrs インスタンスを返す。
 # Resource は参照型なので、コピーせずに渡すと複数箇所が同じオブジェクトを
 # 変更してしまう。Pot.setup や Pot.serve の中で安全なコピーを作るために使う。

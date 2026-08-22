@@ -36,6 +36,7 @@ func setup(base: RecipeResource, pot_ingredients: Array[RecipeResource]) -> void
 	attrs = base.attrs.duplicate_attrs()
 	for ing in pot_ingredients:
 		attrs.add(ing.attrs)
+	attrs.clamp_to_zero()
 	volume = base.base_volume
 
 
@@ -51,6 +52,7 @@ func serve(topping: RecipeResource, yakumi: RecipeResource) -> SoupServing:
 		cup.attrs.add(topping.attrs)
 	if yakumi:
 		cup.attrs.add(yakumi.attrs)
+	cup.attrs.clamp_to_zero()
 	cup.topping = topping
 	cup.yakumi = yakumi
 	return cup
@@ -69,8 +71,9 @@ func on_turn_end() -> void:
 func add_water(times: int = 1) -> void:
 	for i in times:
 		volume += WATER_VOLUME
-		attrs.koku = maxi(attrs.koku + WATER_KOKU, 0)
-		attrs.umami = maxi(attrs.umami + WATER_UMAMI, 0)
+		attrs.koku += WATER_KOKU
+		attrs.umami += WATER_UMAMI
+		attrs.clamp_to_zero()
 
 
 # 鍋が空かどうかを返す。serve する前に必ずチェックすること。
