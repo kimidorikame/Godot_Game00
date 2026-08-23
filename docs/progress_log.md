@@ -701,3 +701,28 @@ kokuに統合した。
 
 サブステップ5-1（sweet/sourの器を追加）から着手。ステップ1（stimulus/aroma追加）と同型の
 安全な軸追加で、評価挙動不変を既存テストで実証してから5-2aへ。
+
+---
+
+## 追記（2026-08-23）: 味システム6軸化 ステップ5-1実装完了
+
+**やったこと**
+
+ステップ5-1（sweet/sour軸の器を追加、コミット `ab649a7`）を実装。ステップ1
+（stimulus/aroma追加）と同型の安全な軸追加で、6フィールド
+（koku/umami/stimulus/aroma/sweet/sour）の過渡段階に到達した。
+
+- `core/soup_attrs.gd`の1ファイルのみ変更。sweet/sourフィールド（デフォルト0）を追加、
+  `add()`/`clamp_to_zero()`/`duplicate_attrs()`に両軸を反映
+- tolerance共通定数`TOLERANCE_SWEET=2`/`TOLERANCE_SOUR=2`を追加。5-1時点では
+  `evaluate`から未参照（sweet/sourは評価に未参加）だが、軸の定義を1箇所に揃えるため
+  器と同時に先置き。評価導入は5-2b
+- `clamp_to_zero()`のsweet/sour対象化は、将来引き算食材が来ても守られるための予防的
+  追加（ステップ3-3で全4軸をクランプ対象にした方針に沿う）
+- evaluator/customer_resource/pot/.tres/テストには一切触れず、評価挙動不変
+- 検証: `test_evaluator`が全ケース同一出力、`test_pot`が13 assert全OKで変更前と一致。
+  器追加で評価挙動不変を実証
+
+**次の一手**
+
+ステップ5-2a（メニュー概念の導入、MenuResource・初回3種の目標6軸値・注文紐付け）。
