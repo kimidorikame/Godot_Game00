@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="MenuResource" format=3]
+
+[ext_resource type="Script" path="res://resources/menu_resource.gd" id="1_menu"]
+[ext_resource type="Script" path="res://core/soup_attrs.gd" id="2_attrs"]
+
+[sub_resource type="Resource" id="SoupAttrs_1"]
+script = ExtResource("2_attrs")
+koku = 10
+umami = 5
+stimulus = 5
+aroma = 5
+sweet = 3
+sour = 5
+
+[resource]
+script = ExtResource("1_menu")
+id = &"tomyum"
+display_name = "トムヤム"
+target = SubResource("SoupAttrs_1")
