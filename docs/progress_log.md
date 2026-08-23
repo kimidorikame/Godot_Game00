@@ -726,3 +726,42 @@ kokuに統合した。
 **次の一手**
 
 ステップ5-2a（メニュー概念の導入、MenuResource・初回3種の目標6軸値・注文紐付け）。
+
+---
+
+## 追記（2026-08-23）: 味システム6軸化 ステップ5-2a実装完了
+
+**やったこと**
+
+ステップ5-2a（メニュー概念の導入、コミット `a3f7c6a`）を実装。評価の二層化（5-2b）の
+前段として、メニューという新概念のデータ層を作った。評価ロジック（`evaluator.gd`）には
+未着手。
+
+- 新規リソース`MenuResource`（`resources/menu_resource.gd`、class_name）を作成。フィールドは
+  `id`/`display_name`/`target`（`SoupAttrs`、目標6軸値）の3つだけ。材料リストは持たせず、
+  レシピ集で見せる作り方ヒントは構造転換フェーズに送る。評価は味（target）で行う方針
+- 初回3種のメニュー`.tres`を`data/menus/`に作成（yakuzen 薬膳スープ / tomyum トムヤム /
+  tomkha トムカーガイ）。target値は暫定（道Aでスケール統一先送りのため現状スケール
+  koku 0〜40・他5軸 0〜5 に読み替えた仮値。スケール統一時に0〜50へ正式振り直し）
+- 注文紐付けは案イ（客とメニューを疎結合にし、評価時に組み合わせて渡す）で進める方針を
+  確定。5-2aでは割り当て（どの客が何を頼むか）は作らず、テストで手組み。動的注文は構造
+  転換フェーズへ
+- 検証: `core/test_menu.gd`（＋起動シーン`scenes/test_menu.tscn`、既存`test_pot.tscn`に
+  倣う）を新規作成。3メニュー×7チェック（id/display_name/6軸）の21 assert全PASS。既存
+  `test_evaluator`/`test_pot`も回帰なし（新規ファイル追加のみのため）
+- 新規class_name導入だが`--headless --editor --quit-after`のリスキャン後も`project.godot`
+  汚染なしを確認。`global_script_class_cache`に`MenuResource`登録を確認。`.godot/`は
+  gitignore済みでコミットに紛れず。`menu_resource.gd.uid`（自動生成UID）は追跡対象に含めた
+
+**コーヒートーク型の体験対応**
+
+会話中に客が注文 → 調理画面で材料を組む → レシピ集で作り方を確認 → 作る、という
+Coffee Talk型の流れに、`MenuResource`がレシピ集の各項目（目標の味）として対応する。
+UI（味ゲージ・レシピ集画面）は構造転換フェーズで実装。
+
+**次の一手**
+
+ステップ5-2b（評価の二層化＋6軸化）。evaluateにメニュー引数を追加し、レシピ軸（カップ
+vs メニュー目標）と好み軸（カップ vs メニュー目標+客オフセット）の二層判定、5値Grade
+（GREAT/GOOD/OK/POOR/BAD）、6軸合格判定を実装。CustomerResourceのidealを「メニュー目標
+からのオフセット」に意味変更し、tolerance_sweet/sourを追加。
