@@ -15,12 +15,16 @@ extends Resource
 # umami    : 旨味の強さ。客の満足度に大きく影響する軸。
 # stimulus : 刺激（パンチ⇔マイルド）。薬味が主担当。単極: 0=マイルド、高=パンチ
 # aroma    : 香り（芳醇⇔淡泊）。香味系が主担当。単極: 0=淡泊、高=芳醇
+# sweet    : 甘さ（甘い⇔甘くない）。ココナッツ・砂糖等が主担当。単極: 0=甘くない、高=強い甘み
+# sour     : 酸味（酸っぱい⇔酸味なし）。ライム・タマリンド・酢等が主担当。単極: 0=酸味なし、高=強い酸味
 # 評価は4軸それぞれについて「idealとの差がtolerance以内か」を個別判定する
-# 軸ごと合格判定モデル（Evaluator参照）。
+# 軸ごと合格判定モデル（Evaluator参照）。sweet/sourはステップ5-1時点では器のみで評価には未参加。
 @export var koku: int = 0
 @export var umami: int = 0
 @export var stimulus: int = 0
 @export var aroma: int = 0
+@export var sweet: int = 0
+@export var sour: int = 0
 
 # 各軸のスケール最大値の目安。データ作成の指針＋失敗判定/UI等の基準。intに上限強制はしない。
 const TASTE_AXIS_MAX := 50
@@ -30,6 +34,10 @@ const TOLERANCE_KOKU := 8
 const TOLERANCE_UMAMI := 2
 const TOLERANCE_STIMULUS := 2
 const TOLERANCE_AROMA := 2
+# sweet/sourはステップ5-1時点ではEvaluatorから未参照（評価導入はステップ5-2b）。
+# 軸の定義を1箇所に揃えるため、器と同時に先に置いておく。値は暫定、ステップ4の数値調整で確定する。
+const TOLERANCE_SWEET := 2
+const TOLERANCE_SOUR := 2
 
 
 # 別の SoupAttrs の値をこのインスタンスに加算する。
@@ -40,6 +48,8 @@ func add(other: SoupAttrs) -> void:
 	umami += other.umami
 	stimulus += other.stimulus
 	aroma += other.aroma
+	sweet += other.sweet
+	sour += other.sour
 
 
 # 負の attrs を持つ食材（黒酢など）を投入した後、各軸が負にならないよう
@@ -49,6 +59,8 @@ func clamp_to_zero() -> void:
 	umami = maxi(umami, 0)
 	stimulus = maxi(stimulus, 0)
 	aroma = maxi(aroma, 0)
+	sweet = maxi(sweet, 0)
+	sour = maxi(sour, 0)
 
 
 # 同じ値を持つ新しい SoupAttrs インスタンスを返す。
@@ -60,4 +72,6 @@ func duplicate_attrs() -> SoupAttrs:
 	a.umami = umami
 	a.stimulus = stimulus
 	a.aroma = aroma
+	a.sweet = sweet
+	a.sour = sour
 	return a
