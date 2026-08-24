@@ -7,7 +7,7 @@
 script = ExtResource("2_attrs")
 koku = -4
 stimulus = -4
-aroma = 0
+sour = 3
 
 [resource]
 script = ExtResource("1_recipe")
