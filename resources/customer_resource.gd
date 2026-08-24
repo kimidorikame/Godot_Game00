@@ -16,17 +16,20 @@ extends Resource
 @export var display_name: String
 
 # 注文メニュー目標からのオフセット（差分）。正=その軸をメニューより高い方に、
-# 負=低い方に寄せると喜ぶ。5-2b本体で評価がこの意味で使い始める。
-# 現時点(5-2b-0)ではリネームのみで、評価ロジックはまだ旧来の絶対値扱いのまま。
+# 負=低い方に寄せると喜ぶ。Evaluatorの好み軸判定で、menu.target + taste_offset を
+# その客にとっての「好みの狙い所」として使う（レシピ軸はtaste_offsetを見ずmenu.targetのみ）。
 @export var taste_offset: SoupAttrs
 
-# 軸ごとの許容幅の客別上書き。-1（デフォルト）のときは「未指定」を意味し、
+# 軸ごとの許容幅の客別上書き（好み軸のみ。レシピ軸は常に共通のRECIPE_TOLERANCE_xxxを使い、
+# 客ごとの上書きを持たない）。-1（デフォルト）のときは「未指定」を意味し、
 # soup_attrs.gd の共通定数（TOLERANCE_xxx）をフォールバックで使う。0以上を指定すると
 # その客だけの上書き値として使う（Evaluator参照）。上書きしたい軸だけ.tresに書けばよい。
 @export var tolerance_koku: int = -1
 @export var tolerance_umami: int = -1
 @export var tolerance_stimulus: int = -1
 @export var tolerance_aroma: int = -1
+@export var tolerance_sweet: int = -1
+@export var tolerance_sour: int = -1
 
 # 通常時の支払い額（OK グレードのときに受け取る金額）。
 @export var base_price: int

@@ -39,6 +39,17 @@ const TOLERANCE_AROMA := 2
 const TOLERANCE_SWEET := 2
 const TOLERANCE_SOUR := 2
 
+# レシピ軸（Evaluatorの二層評価のうち、カップがメニュー目標と一致しているかを見る層）の
+# 許容幅。「メニューとして成立しているか」を緩く見る判定のため、上のTOLERANCE_xxx（好み軸、
+# 客ごと上書き可）より広めに取ってある。レシピ軸は客ごとの上書きを持たず常にこの共通値を使う。
+# 値は暫定、スケール統一・バランス調整フェーズで確定する。
+const RECIPE_TOLERANCE_KOKU := 16
+const RECIPE_TOLERANCE_UMAMI := 4
+const RECIPE_TOLERANCE_STIMULUS := 4
+const RECIPE_TOLERANCE_AROMA := 4
+const RECIPE_TOLERANCE_SWEET := 4
+const RECIPE_TOLERANCE_SOUR := 4
+
 
 # 別の SoupAttrs の値をこのインスタンスに加算する。
 # 鍋に食材を投入するときや、サーブ時にトッピング・薬味の補正を

@@ -1,5 +1,9 @@
 extends Control
 
+# 5-2b仮。全客が薬膳スープを注文する固定メニュー。客ごと・日ごとにメニューが変わる
+# 動的注文は構造転換フェーズで実装する。debug_pot.gd も game.gd と同じ固定メニューを使う。
+const ORDERED_MENU := preload("res://data/menus/yakuzen.tres")
+
 # ─── 食材データ（data/recipes/ の .tres を参照）────────────
 # トッピング・薬味の先頭 null は「なし」を表す。
 var _bases: Array[RecipeResource] = [
@@ -90,7 +94,7 @@ func _on_serve() -> void:
 	var topping: RecipeResource = _toppings[_topping_index]
 	var yakumi: RecipeResource = _yakumis[_yakumi_index]
 	var cup := _pot.serve(topping, yakumi)
-	var result: Evaluator.Result = Evaluator.evaluate(cup, _customers[_customer_index])
+	var result: Evaluator.Result = Evaluator.evaluate(cup, _customers[_customer_index], ORDERED_MENU)
 	_show_result(cup, result)
 	_refresh()
 
@@ -118,7 +122,7 @@ func _on_reset() -> void:
 # ─── 表示更新 ─────────────────────────────────────────────
 
 func _show_result(cup: SoupServing, result: Evaluator.Result) -> void:
-	var grade_str: String = ["大満足", "美味しい", "普通", "不満"][int(result.grade)]
+	var grade_str: String = ["大満足", "美味しい", "普通", "イマイチ", "不満"][int(result.grade)]
 	var over_str: String  = "over" if result.over else "under"
 	%LabelResult.text = "%s  |  payment=%d  rep_delta=%+d\nworst: %s(%s)  cup(koku=%d u=%d)" % [
 		grade_str, result.payment, result.rep_delta,
