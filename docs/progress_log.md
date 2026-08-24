@@ -765,3 +765,31 @@ UI（味ゲージ・レシピ集画面）は構造転換フェーズで実装。
 vs メニュー目標）と好み軸（カップ vs メニュー目標+客オフセット）の二層判定、5値Grade
 （GREAT/GOOD/OK/POOR/BAD）、6軸合格判定を実装。CustomerResourceのidealを「メニュー目標
 からのオフセット」に意味変更し、tolerance_sweet/sourを追加。
+
+---
+
+## 追記（2026-08-24）: 味システム6軸化 ステップ5-2b実装完了（評価の二層化）
+
+**やったこと**
+
+ステップ5-2bを2コミットで実装。評価ロジックを二層（レシピ軸＋好み軸）に作り替え、6軸化し、Gradeを5値化した。今回のステップ5の中心となる変更。
+
+- 5-2b-0（コミット 596369d、refactor）: CustomerResource.ideal を taste_offset にリネーム（先行）。純粋な機械置換で挙動不変。フィールドの意味が「客の絶対的な理想値」から「注文メニュー目標からのオフセット」に変わる本体変更の前段として、名前だけ先行してリネーム。参照箇所は evaluator.gd / test_evaluator.gd / debug_pot.gd / DebugPot.tscn / 客.tres 3件に波及（debug_pot は当初指示から漏れていたが Claude Code の grep で発見・対応）。プロジェクト全体で ideal のフィールド参照残存ゼロを確認、テスト出力不変、DebugPotシーンもエラーなし
+- 5-2b本体（コミット fe04e22、feat）: 評価の二層化・6軸化・Grade5値化
+  - soup_attrs.gd: レシピ軸用 tolerance 定数 RECIPE_TOLERANCE_xxx を追加（koku=16、他5軸=4。好み軸用 TOLERANCE_xxx より広め。客上書きなしの共通固定。暫定値）
+  - evaluator.gd: 二層評価に作り替え。レシピ軸=カップ vs メニュー目標（RECIPE_TOLERANCE、共通）で recipe_pass を数える。好み軸=カップ vs (メニュー目標+客オフセット)（_tol()で客上書き解決）で taste_pass を数える。Grade5値化（GREAT/GOOD/OK/POOR/BAD）。判定順: taste_pass==6→GREAT / recipe_pass==6 かつ taste_pass>=1→GOOD / recipe_pass==6 かつ taste_pass==0→OK / recipe_pass 1〜5→POOR / recipe_pass==0→BAD。payment/rep_delta は GREAT=base+tip/+1, GOOD=base/+1, OK=base/0, POOR=base×0.5/0, BAD=base×0.5/-1。_fill_worst_axis を6軸化＋基準を好み軸（メニュー目標+客オフセット）に変更。evaluate シグネチャに menu: MenuResource を追加（案イ・疎結合）
+  - customer_resource.gd: 好み軸 tolerance の tolerance_sweet/tolerance_sour を追加（デフォルト-1、既存2軸と同型）。taste_offset を正式な意味（オフセット）に整理
+  - game.gd / debug_pot.gd: evaluate 呼び出しにメニュー引数を追加。当面 const ORDERED_MENU = yakuzen 固定（全客が薬膳スープを注文する仮接続。客ごと・日ごとの動的注文は構造転換フェーズ）。Grade表示配列を5値化（イマイチ=POOR を追加）
+  - test_evaluator.gd: 二層評価・5値Grade・6軸に全面書き換え。テスト内で仮メニューを new し境界を狙った目標値を組む。5値Grade全網羅、客オフセット効果、好み軸tolerance客上書き効果、worst_axis を検証
+
+**検算による確認**
+
+コミット前に、GOOD/OK/POORの代表ケースを1軸ずつダンプして二層評価の挙動を独立に検算した。例えばGOODケース（cup=(40,5,2,7,3,1)、target=(40,5,2,4,3,1)、offset全軸0）は、aromaがレシピ軸ではPASS（|7-4|=3≤RECIPE_TOLERANCE_AROMA=4）だが好み軸ではFAIL（3>TOLERANCE_AROMA=2）で taste_pass=5/6・recipe_pass=6/6となりGOOD。「レシピ通りには作れているが客の好みから1軸外れている＝GOOD」という二層評価の狙い通りの挙動を数値で確認。GREATとGOODの境界がこの1軸で分かれることを実証。
+
+**スコープ**
+
+今回はロジック・テスト・メニュー固定接続まで。データの6軸振り直し（食材へのsweet/sour付与、客オフセットの実データ設定）はサブステップ5-3。
+
+**次の一手**
+
+ステップ5-3（全食材データの6軸振り直し＋客オフセット設定）。食材9件にsweet/sourを付与、客3件のtaste_offsetを「メニュー目標からのオフセット」の意味で設定、客の注文メニュー紐付け。機構は5-2bで固定済みなので値だけを触る。
