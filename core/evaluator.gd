@@ -44,20 +44,20 @@ class Result extends RefCounted:
 # 呼んでも鍋・客・ゲーム状態は変化しない（副作用なし）。
 #
 # 軸ごと合格判定モデル: 合算した単一距離ではなく、koku/umami/stimulus/aroma の4軸
-# それぞれについて「idealとの差がtolerance以内か」を個別に判定し、合格した軸の本数で
+# それぞれについて「taste_offsetとの差がtolerance以内か」を個別に判定し、合格した軸の本数で
 # グレードを決める。1軸大外し＋他ピタリ、と全軸を薄く外す、を区別できるようにするため。
 # 各軸のtoleranceは客ごとに上書き可能（CustomerResource.tolerance_xxx が -1 なら
 # soup_attrs.gd の共通定数、0以上ならその客の値を使う。_tol() で解決する）。
 static func evaluate(cup: SoupServing, customer: CustomerResource) -> Result:
 	var r := Result.new()
 	var pass_count := 0
-	if abs(cup.attrs.koku - customer.ideal.koku) <= _tol(customer.tolerance_koku, SoupAttrs.TOLERANCE_KOKU):
+	if abs(cup.attrs.koku - customer.taste_offset.koku) <= _tol(customer.tolerance_koku, SoupAttrs.TOLERANCE_KOKU):
 		pass_count += 1
-	if abs(cup.attrs.umami - customer.ideal.umami) <= _tol(customer.tolerance_umami, SoupAttrs.TOLERANCE_UMAMI):
+	if abs(cup.attrs.umami - customer.taste_offset.umami) <= _tol(customer.tolerance_umami, SoupAttrs.TOLERANCE_UMAMI):
 		pass_count += 1
-	if abs(cup.attrs.stimulus - customer.ideal.stimulus) <= _tol(customer.tolerance_stimulus, SoupAttrs.TOLERANCE_STIMULUS):
+	if abs(cup.attrs.stimulus - customer.taste_offset.stimulus) <= _tol(customer.tolerance_stimulus, SoupAttrs.TOLERANCE_STIMULUS):
 		pass_count += 1
-	if abs(cup.attrs.aroma - customer.ideal.aroma) <= _tol(customer.tolerance_aroma, SoupAttrs.TOLERANCE_AROMA):
+	if abs(cup.attrs.aroma - customer.taste_offset.aroma) <= _tol(customer.tolerance_aroma, SoupAttrs.TOLERANCE_AROMA):
 		pass_count += 1
 
 	# 合格本数→グレード。4→GREAT, 3→GOOD, 2/1→OK, 0→BAD。
@@ -91,10 +91,10 @@ static func _tol(customer_value: int, default_const: int) -> int:
 # evaluate() の内部処理として呼ばれ、直接呼ぶ場面はない。
 static func _fill_worst_axis(r: Result, cup: SoupServing, c: CustomerResource) -> void:
 	var diffs := {
-		&"koku":     cup.attrs.koku     - c.ideal.koku,
-		&"umami":    cup.attrs.umami    - c.ideal.umami,
-		&"stimulus": cup.attrs.stimulus - c.ideal.stimulus,
-		&"aroma":    cup.attrs.aroma    - c.ideal.aroma,
+		&"koku":     cup.attrs.koku     - c.taste_offset.koku,
+		&"umami":    cup.attrs.umami    - c.taste_offset.umami,
+		&"stimulus": cup.attrs.stimulus - c.taste_offset.stimulus,
+		&"aroma":    cup.attrs.aroma    - c.taste_offset.aroma,
 	}
 	var worst: StringName = &"koku"
 	for k: StringName in diffs:

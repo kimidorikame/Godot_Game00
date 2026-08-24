@@ -167,6 +167,6 @@ func _refresh() -> void:
 	%LabelCustomerName.text = "%s  [%d/%d]" % [
 		c.display_name, _customer_index + 1, _customers.size()
 	]
-	%LabelIdeal.text = "ideal: koku=%-2d  u=%-2d  s=%-2d  a=%-2d" % [
-		c.ideal.koku, c.ideal.umami, c.ideal.stimulus, c.ideal.aroma,
+	%LabelIdeal.text = "taste_offset: koku=%-2d  u=%-2d  s=%-2d  a=%-2d" % [
+		c.taste_offset.koku, c.taste_offset.umami, c.taste_offset.stimulus, c.taste_offset.aroma,
 	]

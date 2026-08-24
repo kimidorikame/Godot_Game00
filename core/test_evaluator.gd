@@ -13,21 +13,21 @@ func _run() -> void:
 	# 老人: あっさり系（koku低め）・旨味高・香り高・刺激苦手
 	var roujin := CustomerResource.new()
 	roujin.display_name = "老人"
-	roujin.ideal      = _attrs(10, 4, 0, 4)
+	roujin.taste_offset = _attrs(10, 4, 0, 4)
 	roujin.base_price = 300
 	roujin.tip        = 100
 
 	# 配達員: 濃厚・旨味重視・刺激好き
 	var haitatsuin := CustomerResource.new()
 	haitatsuin.display_name = "配達員"
-	haitatsuin.ideal      = _attrs(45, 4, 4, 2)
+	haitatsuin.taste_offset = _attrs(45, 4, 4, 2)
 	haitatsuin.base_price = 250
 	haitatsuin.tip        = 80
 
 	# 刑事（元料理人）: バランス・旨味重視・香り良い
 	var keiji := CustomerResource.new()
 	keiji.display_name   = "刑事"
-	keiji.ideal          = _attrs(25, 5, 2, 4)
+	keiji.taste_offset   = _attrs(25, 5, 2, 4)
 	keiji.base_price     = 400
 	keiji.tip            = 150
 	keiji.is_pro_critic  = true
@@ -56,7 +56,7 @@ func _run() -> void:
 	# フォールバック（既存roujinが変わらないこと）と上書き効果の両方を確認する。
 	var roujin_tol := CustomerResource.new()
 	roujin_tol.display_name = "老人(tolerance上書き)"
-	roujin_tol.ideal              = _attrs(10, 4, 0, 4)
+	roujin_tol.taste_offset        = _attrs(10, 4, 0, 4)
 	roujin_tol.tolerance_umami    = 1
 	roujin_tol.tolerance_stimulus = 4
 	roujin_tol.tolerance_aroma    = 1
@@ -100,7 +100,7 @@ func _eval(cup: SoupServing, customer: CustomerResource) -> void:
 	print("  客: %-12s  cup(koku=%d u=%d s=%d a=%d)  ideal(koku=%d u=%d s=%d a=%d)" % [
 		customer.display_name,
 		cup.attrs.koku, cup.attrs.umami, cup.attrs.stimulus, cup.attrs.aroma,
-		customer.ideal.koku, customer.ideal.umami, customer.ideal.stimulus, customer.ideal.aroma,
+		customer.taste_offset.koku, customer.taste_offset.umami, customer.taste_offset.stimulus, customer.taste_offset.aroma,
 	])
 	print("  → %-5s  payment=%d  rep_delta=%+d  worst=%s(%s)" % [
 		grade_str, result.payment, result.rep_delta,
