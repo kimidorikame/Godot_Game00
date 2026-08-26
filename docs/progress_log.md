@@ -917,3 +917,31 @@ test_evaluator 全PASS・出力不変（テスト内で客をnewしており実.
 **次の一手**
 
 未確定の数値（水の1日量、モブの鍋消費と単価、評判→モブ数の変換幅、昼の行動枠と水購入の関係）。その後、仕様書14章の実装順序で浅い版の実装へ（食材20品のタグ定義→成立6ルール→相性6ルール→CustomerProfile/VisitState分離→事情適合→1キャラで台詞を通す）。
+
+---
+
+## 追記（2026-08-26）: 料理評価システム 局面1a 実装完了（データ構造の骨格）
+
+**やったこと**
+
+新しい料理評価システム（事情適合＋3層評価）の実装を開始。移行戦略は並行新設（アプローチB＝既存6軸系を無傷で残し、新系を横に建てて動いたら旧系を削除）。その局面1a（データ構造の骨格）を実装（コミット 7fe8bbe）。判定ロジックはまだ書かず、器だけを新設。旧系（SoupAttrs/Evaluator/CustomerResource/MenuResource/Pot 等）には一切触れていない。
+
+- 新系は core/dish/ に新設（旧系 core/ 直下と物理的に分離、二重状態でも新旧が一目で分かる）
+- core/dish/dish_tags.gd（class_name DishTags）: タグ語彙の StringName 定数群。味カテゴリ7（salty/umami/sweet/sour/bitter/koku/stimulus）、性質タグ11（meat/fat/gelatin/seafood/plain/absorbent/dried/strong_odor/fungus/vegetable/plant、苦味は味カテゴリのbitterを流用）、香りタグ9（medicinal/citrus/warm/strong/fermented/fresh/soy/sea_aroma、deodorizing）、満腹3値、価格帯3値。タイプミス防止と一元管理
+- core/dish/ingredient_data.gd（class_name IngredientData、Resource）: 新系の食材データ。既存 RecipeResource の6軸数値 attrs をタグに置き換えたもの。id/display_name/kind(INGREDIENT/SEASONING/SPICE)/taste_traits/property_tags/aroma_tags/satiety/cost_band。数値距離計算をしない
+- core/dish/dish_result.gd（class_name DishResult、RefCounted）: 3層評価＋固定嗜好＋物語フラグを合算せず別々に保持する器。enum Validity/Harmony/NeedFit/PreferenceFit と対応フィールド、story_flags/fired_events。旧 Evaluator.Result が payment/grade に畳んでいたのと対照的。経済出力はこの結果から別途導出
+
+**設計判断**
+
+- 移行戦略はB（並行新設）。パラダイム転換（数値距離→タグ・カテゴリ判定）のため、in-place改造だと中間状態が壊れるリスクがある。旧系をテスト付きで残せば参照実装になる。5-2bのin-place（同パラダイム内の拡張）とは状況が異なる
+- タグ語彙は StringName 定数群（配列に入れやすく .tres に書きやすい）
+- 旧 RecipeResource と新 IngredientData の一時的二重は許容（Bの必然、局面3で旧を削除して解消）
+- 1a のスコープは3つの器（DishTags/IngredientData/DishResult）のみ。CompatibilityRule は相性ルール実装時（1d）、CustomerProfile/VisitState は客の作り替え時（1e）、RecipeBookEntry は料理帳（1g）で作る
+
+**実装フェーズの地図**
+
+局面1（新系を横に建てる、旧系無傷）: 1a データ構造の骨格【完了】→ 1b 食材20品のタグ定義 → 1c 料理成立6ルール → 1d 食材相性6ルール → 1e CustomerProfile/VisitState分離・事情適合・反応マトリクス → 1f 物語フラグとイベントID台詞を1キャラで通す → 1g 料理帳。局面2（切り替え、game.gd を旧Evaluatorから新系へ）。局面3（旧系削除）。鍋（Pot）の改造（4段階濃度・水の有限性・モブ消費）は評価系移行の後。
+
+**次の一手**
+
+局面1b（食材20品のタグ定義）。仕様書4章の食材表（具材10/調味料5/香辛料5）を IngredientData の .tres として作る。DishTags のタグを使う。
